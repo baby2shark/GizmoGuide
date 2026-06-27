@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GizmoGuide</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark">G</div>
+          <div>
+            <strong>GizmoGuide</strong>
+            <span>电子商品购买助手</span>
+          </div>
+        </div>
+        <div class="status-pill">P1 MVP</div>
+      </header>
+
+      <main class="chat-layout">
+        <section id="chat-stream" class="chat-stream" aria-live="polite">
+          <div id="welcome-state" class="welcome-state">
+            <div class="welcome-mark">GizmoGuide</div>
+            <h1>今天想比较哪两款电子产品？</h1>
+            <p>先选择两款候选商品，我会先给出基础对比。之后你可以像正常聊天一样继续告诉我预算、用途和顾虑。</p>
+
+            <div class="suggestion-grid" aria-label="Preset scenarios">
+              <button type="button" class="suggestion-card preset" data-message="学生党，预算3000以内，日常和轻度游戏，想用三年，性价比重要" data-a="Redmi K70" data-b="iPhone 15 Pro">
+                <strong>学生预算</strong>
+                <span>Redmi K70 vs iPhone 15 Pro</span>
+              </button>
+              <button type="button" class="suggestion-card preset" data-message="主要拍照和旅行，预算6000以内，想要影像好一点，也希望别太重" data-a="Xiaomi 14 Ultra" data-b="vivo X100">
+                <strong>拍照旅行</strong>
+                <span>Xiaomi 14 Ultra vs vivo X100</span>
+              </button>
+              <button type="button" class="suggestion-card preset" data-message="给父母买，预算4000左右，日常微信视频，续航和稳定性最重要，用三年" data-a="Honor Magic6" data-b="Redmi K70">
+                <strong>长辈使用</strong>
+                <span>Honor Magic6 vs Redmi K70</span>
+              </button>
+            </div>
+
+            <form id="compare-form" class="compare-form" aria-label="Product comparison setup">
+              <div class="product-picker">
+                <label>
+                  <span>候选 A</span>
+                  <select id="product-a" name="productA" aria-label="候选商品 A"></select>
+                </label>
+                <label>
+                  <span>候选 B</span>
+                  <select id="product-b" name="productB" aria-label="候选商品 B"></select>
+                </label>
+              </div>
+              <button id="compare-button" class="compare-button" type="submit">开始对比</button>
+            </form>
+          </div>
+        </section>
+
+        <form id="chat-form" class="composer hidden" aria-label="Chat input">
+          <div class="composer-box">
+            <textarea id="user-message" name="userMessage" rows="1" placeholder="继续问：我的预算5000，主要拍照和日常用，想用三年，也在意维修"></textarea>
+            <button id="submit-button" class="send-button" type="submit" aria-label="发送消息">
+              <span>↑</span>
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

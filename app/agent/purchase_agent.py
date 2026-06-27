@@ -1,0 +1,191 @@
+from __future__ import annotations
+
+import json
+from typing import Any
+from uuid import uuid4
+
+from app.agent.llm_client import ChatMessage, DeepSeekClient
+from app.agent.prompts import AGENT_SYSTEM_PROMPT
+from app.agent.state import ConversationState, session_store
+from app.config.settings import get_settings
+from app.decision.engine import recommend
+from app.orchestrator.profile_extractor import extract_profile
+from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.recommendation import RecommendationRequest, RecommendationResponse, RecommendationResult
+from app.tools.product_tool import ProductTool
+from app.tools.scoring_tool import ScoringTool
+
+
+class PurchaseDecisionAgent:
+    def __init__(self, llm_client: DeepSeekClient | None = None):
+        settings = get_settings()
+        self.llm_client = llm_client or DeepSeekClient(settings)
+        self.product_tool = ProductTool()
+        self.scoring_tool = ScoringTool()
+
+    def chat(self, request: ChatRequest) -> ChatResponse:
+        state = session_store.get(request.session_id)
+        self._update_candidates(state, request.candidate_products)
+        state.profile = extract_profile(request.message, state.profile)
+        state.messages.append({"role": "user", "content": request.message})
+
+        scoring_result = self._try_scoring(state)
+
+        if self.llm_client.enabled:
+            try:
+                response = self._llm_chat(request, state, scoring_result)
+                state.messages.append({"role": "assistant", "content": response.assistant_message})
+                return response
+            except Exception as exc:
+                fallback = self._fallback_chat(request, state, scoring_result)
+                fallback.agent_trace.append(f"llm_failed:{type(exc).__name__}")
+                state.messages.append({"role": "assistant", "content": fallback.assistant_message})
+                return fallback
+
+        fallback = self._fallback_chat(request, state, scoring_result)
+        state.messages.append({"role": "assistant", "content": fallback.assistant_message})
+        return fallback
+
+    def handle(self, request: RecommendationRequest) -> RecommendationResponse:
+        chat_response = self.chat(
+            ChatRequest(
+                session_id=f"recommendation-compat-{uuid4().hex}",
+                message=request.user_message,
+                candidate_products=request.candidate_products,
+            )
+        )
+        return RecommendationResponse(
+            need_clarification=chat_response.mode == "chat" and chat_response.recommendation is None,
+            clarification_questions=[],
+            user_profile=chat_response.user_profile,
+            products=chat_response.products,
+            recommendation=chat_response.recommendation,
+            answer=chat_response.assistant_message,
+            answer_source=chat_response.answer_source,
+            agent_trace=chat_response.agent_trace,
+        )
+
+    def _update_candidates(self, state: ConversationState, candidate_products: list[str]) -> None:
+        if not candidate_products:
+            return
+        products, _ = self.product_tool.get_products(candidate_products)
+        if products:
+            state.candidate_products = products
+
+    def _try_scoring(self, state: ConversationState) -> RecommendationResult | None:
+        if len(state.candidate_products) < 2:
+            return None
+        try:
+            return self.scoring_tool.evaluate(state.candidate_products, state.profile)
+        except Exception:
+            return None
+
+    def _llm_chat(
+        self,
+        request: ChatRequest,
+        state: ConversationState,
+        scoring_result: RecommendationResult | None,
+    ) -> ChatResponse:
+        payload = {
+            "current_user_message": request.message,
+            "conversation_history": state.messages[-8:],
+            "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
+            "user_profile": state.profile.model_dump(mode="json"),
+            "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
+            "tooling_status": {
+                "product_tool": "available_mock_data",
+                "scoring_guardrail_tool": "available_reference_only",
+                "web_search_tool": "not_implemented_yet",
+                "local_kb_rag_tool": "not_implemented_yet",
+            },
+        }
+        data = self.llm_client.chat_json(
+            [
+                ChatMessage(role="system", content=AGENT_SYSTEM_PROMPT),
+                ChatMessage(role="user", content=json.dumps(payload, ensure_ascii=False)),
+            ],
+            temperature=0.3,
+        )
+        mode = "recommendation" if data.get("mode") == "recommendation" else "chat"
+        recommendation = None
+        if mode == "recommendation" and scoring_result is not None:
+            recommendation = self._recommendation_from_llm(data, scoring_result)
+
+        return ChatResponse(
+            session_id=state.session_id,
+            mode=mode,
+            assistant_message=str(data.get("assistant_message") or data.get("summary") or "我需要再了解一点你的购买需求。"),
+            user_profile=state.profile,
+            products=state.candidate_products,
+            recommendation=recommendation,
+            answer_source="llm",
+            agent_trace=["used_agent", "used_product_tool", "used_scoring_guardrail_tool", "used_deepseek"],
+        )
+
+    def _recommendation_from_llm(self, data: dict[str, Any], fallback: RecommendationResult) -> RecommendationResult:
+        score_by_id = {score.product_id: score for score in fallback.scores}
+        winner_id = data.get("winner_id") if data.get("winner_id") in score_by_id else fallback.winner_id
+        winner_name = score_by_id[winner_id].product_name
+        confidence = data.get("confidence", fallback.confidence)
+        return RecommendationResult(
+            winner_id=winner_id,
+            winner_name=winner_name,
+            confidence=max(0.0, min(1.0, float(confidence))),
+            scores=fallback.scores,
+            key_reasons=list(data.get("key_reasons") or fallback.key_reasons),
+            risks=list(data.get("risks") or fallback.risks),
+            reversal_conditions=list(data.get("reversal_conditions") or fallback.reversal_conditions),
+            missing_information=list(data.get("missing_information") or fallback.missing_information),
+        )
+
+    def _fallback_chat(
+        self,
+        request: ChatRequest,
+        state: ConversationState,
+        scoring_result: RecommendationResult | None,
+    ) -> ChatResponse:
+        if len(state.candidate_products) < 2:
+            message = "你先选两款想比较的商品，我会先帮你做基础对比，然后继续聊你的预算和用途。"
+            mode = "chat"
+            recommendation = None
+        elif scoring_result and self._profile_has_enough_signal(state):
+            message = self._fallback_recommendation_message(scoring_result)
+            mode = "recommendation"
+            recommendation = scoring_result
+        else:
+            message = self._next_natural_question(state)
+            mode = "chat"
+            recommendation = None
+
+        return ChatResponse(
+            session_id=state.session_id,
+            mode=mode,
+            assistant_message=message,
+            user_profile=state.profile,
+            products=state.candidate_products,
+            recommendation=recommendation,
+            answer_source="fallback",
+            agent_trace=["used_agent", "used_product_tool", "used_scoring_guardrail_tool", "llm_disabled"],
+        )
+
+    def _profile_has_enough_signal(self, state: ConversationState) -> bool:
+        profile = state.profile
+        return bool(profile.budget and profile.primary_scenarios)
+
+    def _next_natural_question(self, state: ConversationState) -> str:
+        profile = state.profile
+        names = " 和 ".join(product.name for product in state.candidate_products[:2])
+        if not profile.budget:
+            return f"这两款 {names} 我已经有基础参数了。你大概预算上限是多少？我会结合价格压力来判断。"
+        if not profile.primary_scenarios:
+            return f"预算我记下了。你主要拿它做什么？比如拍照、游戏、日常、办公，或者给长辈用。"
+        return "我还想确认一个关键点：你更担心价格、维修风险、续航，还是拍照/性能体验？"
+
+    def _fallback_recommendation_message(self, result: RecommendationResult) -> str:
+        lines = [f"综合你目前说的信息，我更倾向推荐 {result.winner_name}。"]
+        if result.key_reasons:
+            lines.append("主要原因是：" + "；".join(result.key_reasons[:3]))
+        if result.risks:
+            lines.append("需要注意：" + "；".join(result.risks[:2]))
+        lines.append("后面接入联网搜索和本地维修知识库后，我可以把评测、口碑和维修风险也纳入判断。")
+        return "\n".join(lines)
