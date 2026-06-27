@@ -11,10 +11,19 @@ class Settings:
     deepseek_base_url: str
     deepseek_model: str
     llm_timeout_seconds: float
+    bocha_api_key: str | None = None
+    bocha_base_url: str = "https://api.bochaai.com"
+    web_search_timeout_seconds: float = 20.0
+    web_search_cache_ttl_seconds: float = 21600.0
+    agent_max_tool_rounds: int = 4
 
     @property
     def llm_enabled(self) -> bool:
         return bool(self.deepseek_api_key)
+
+    @property
+    def web_search_enabled(self) -> bool:
+        return bool(self.bocha_api_key)
 
 
 def load_dotenv(path: Path | None = None) -> None:
@@ -38,4 +47,9 @@ def get_settings() -> Settings:
         deepseek_base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
         deepseek_model=os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
         llm_timeout_seconds=float(os.getenv("LLM_TIMEOUT_SECONDS", "25")),
+        bocha_api_key=os.getenv("BOCHA_API_KEY"),
+        bocha_base_url=os.getenv("BOCHA_BASE_URL", "https://api.bochaai.com"),
+        web_search_timeout_seconds=float(os.getenv("WEB_SEARCH_TIMEOUT_SECONDS", "20")),
+        web_search_cache_ttl_seconds=float(os.getenv("WEB_SEARCH_CACHE_TTL_SECONDS", "21600")),
+        agent_max_tool_rounds=int(os.getenv("AGENT_MAX_TOOL_ROUNDS", "4")),
     )
