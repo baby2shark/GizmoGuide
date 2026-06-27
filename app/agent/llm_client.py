@@ -27,13 +27,18 @@ class DeepSeekClient:
         if not self.settings.deepseek_api_key:
             raise RuntimeError("DEEPSEEK_API_KEY is not configured.")
 
-        url = self.settings.deepseek_base_url.rstrip("/") + "/chat/completions"
         payload = {
             "model": self.settings.deepseek_model,
             "messages": [message.__dict__ for message in messages],
             "temperature": temperature,
             "response_format": {"type": "json_object"},
         }
+        data = self._post(payload)
+        content = data["choices"][0]["message"]["content"]
+        return json.loads(content)
+
+    def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
+        url = self.settings.deepseek_base_url.rstrip("/") + "/chat/completions"
         request = urllib.request.Request(
             url,
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
@@ -53,6 +58,4 @@ class DeepSeekClient:
         except urllib.error.URLError as exc:
             raise RuntimeError(f"DeepSeek network error: {exc.reason}") from exc
 
-        data = json.loads(raw)
-        content = data["choices"][0]["message"]["content"]
-        return json.loads(content)
+        return json.loads(raw)

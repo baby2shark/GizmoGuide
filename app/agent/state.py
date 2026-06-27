@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
 from app.schemas.product import ProductSpec
 from app.schemas.user_profile import UserProfile
@@ -12,6 +13,7 @@ class ConversationState:
     candidate_products: list[ProductSpec] = field(default_factory=list)
     profile: UserProfile = field(default_factory=UserProfile)
     messages: list[dict[str, str]] = field(default_factory=list)
+    agent_messages: list[Any] = field(default_factory=list)
 
 
 class InMemorySessionStore:
