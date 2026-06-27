@@ -12,18 +12,6 @@ let activeCandidates = [];
 let hasCompared = false;
 let sessionId = `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-const dimensionLabels = {
-  price: "价格",
-  performance: "性能",
-  camera: "拍照",
-  battery: "续航",
-  screen: "屏幕",
-  portability: "便携",
-  storage: "存储",
-  stability: "稳定",
-  repair: "维修",
-};
-
 for (const button of document.querySelectorAll(".preset")) {
   button.addEventListener("click", () => {
     selectProduct(productA, button.dataset.a);
@@ -250,70 +238,15 @@ function appendErrorMessage(error) {
 }
 
 function renderAssistantContent(data) {
-  if (data.mode === "chat" || !data.recommendation) {
-    return `<div class="plain-answer">${escapeHtml(data.assistant_message).replaceAll("\n", "<br>")}</div>`;
-  }
-
-  const recommendation = data.recommendation;
-  return `
-    <div class="plain-answer">${escapeHtml(data.assistant_message).replaceAll("\n", "<br>")}</div>
-    <header class="result-header">
-      <div>
-        <h2>更推荐 ${escapeHtml(recommendation.winner_name)}</h2>
-        <p class="result-meta">预算 ${data.user_profile.budget ?? "未明确"} 元 · 场景 ${formatScenarios(data.user_profile.primary_scenarios)} · ${data.products.length} 款候选 · ${data.answer_source === "llm" ? "Agent" : "Fallback"}</p>
-      </div>
-      <div class="confidence">
-        <strong>${Math.round(recommendation.confidence * 100)}%</strong>
-        <span>置信度</span>
-      </div>
-    </header>
-
-    <section class="score-grid">
-      ${recommendation.scores.map(renderScoreCard).join("")}
-    </section>
-
-    ${renderListBlock("主要理由", recommendation.key_reasons, "clean-list")}
-    ${renderListBlock("风险提示", recommendation.risks, "clean-list danger-list")}
-    ${renderListBlock("结论反转条件", recommendation.reversal_conditions, "clean-list warning-list")}
-    ${renderListBlock("缺失信息", recommendation.missing_information, "clean-list")}
-  `;
+  return `<div class="plain-answer">${renderRichText(data.assistant_message)}</div>`;
 }
 
-function renderScoreCard(score) {
-  const rows = Object.entries(score.dimension_scores)
-    .map(([key, value]) => {
-      const width = Math.max(5, Math.min(100, value * 10));
-      return `
-        <div class="dimension-row">
-          <span>${dimensionLabels[key] ?? key}</span>
-          <div class="bar"><span style="width:${width}%"></span></div>
-          <strong>${Number(value).toFixed(1)}</strong>
-        </div>
-      `;
-    })
-    .join("");
-
-  return `
-    <article class="score-card">
-      <div class="score-title">
-        <span>${escapeHtml(score.product_name)}</span>
-        <span class="score-value">${Number(score.total_score).toFixed(1)}</span>
-      </div>
-      <div class="dimension-list">${rows}</div>
-    </article>
-  `;
-}
-
-function renderListBlock(title, items, className) {
-  if (!items || items.length === 0) return "";
-  return `
-    <section class="section-block">
-      <h3>${title}</h3>
-      <ul class="${className}">
-        ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
-      </ul>
-    </section>
-  `;
+function renderRichText(value) {
+  // 先转义防 XSS，再把 **xxx** 还原成 <strong>，最后换行转 <br>。
+  const escaped = escapeHtml(value ?? "");
+  return escaped
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replaceAll("\n", "<br>");
 }
 
 function getProduct(idOrName) {
@@ -326,12 +259,6 @@ function normalize(value) {
 
 function repairRiskLabel(value) {
   return { low: "低", medium: "中", high: "高" }[value] ?? value;
-}
-
-function formatScenarios(scenarios) {
-  if (!scenarios || scenarios.length === 0) return "未明确";
-  const labels = { photo: "拍照", gaming: "游戏", daily: "日常", business: "商务", elder: "长辈", student: "学生", travel: "旅行" };
-  return scenarios.map((item) => labels[item] ?? item).join("、");
 }
 
 function autosizeTextarea() {
