@@ -8,6 +8,7 @@ from pydantic_ai import capture_run_messages
 from pydantic_ai.exceptions import UsageLimitExceeded
 from pydantic_ai.usage import UsageLimits
 
+from app.agent.intent_classifier import IntentClassifier
 from app.agent.llm_client import ChatMessage, DeepSeekClient
 from app.agent.prompts import AGENT_SYSTEM_PROMPT
 from app.agent.recommend_agent import RecommendDeps, build_finisher_agent, build_recommend_agent
@@ -16,6 +17,7 @@ from app.agent.state import ConversationState, session_store
 from app.config.settings import get_settings
 from app.orchestrator.profile_extractor import extract_profile
 from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.intent import IntentResult
 from app.schemas.recommendation import RecommendationRequest, RecommendationResponse, RecommendationResult
 from app.tools.product_tool import ProductTool
 from app.tools.scoring_tool import ScoringTool
@@ -33,6 +35,7 @@ class PurchaseDecisionAgent:
         self.scoring_tool = ScoringTool()
         self.web_search_tool = WebSearchTool(settings)
         self.knowledge_search_tool = KnowledgeSearchTool(settings)
+        self.intent_classifier = IntentClassifier()
 
     def chat(self, request: ChatRequest) -> ChatResponse:
         with trace_span(
@@ -41,6 +44,8 @@ class PurchaseDecisionAgent:
         ) as (span, end_span):
             state = session_store.get(request.session_id)
             self._update_candidates(state, request.candidate_products)
+            known_candidates = request.candidate_products or [product.id for product in state.candidate_products]
+            intent = self.intent_classifier.classify(request.message, known_candidates)
             state.profile = extract_profile(request.message, state.profile)
             state.messages.append({"role": "user", "content": request.message})
 
@@ -48,33 +53,38 @@ class PurchaseDecisionAgent:
 
             if self.llm_client.enabled and (self.web_search_tool.enabled or self.knowledge_search_tool.enabled):
                 try:
-                    response = self._agent_loop_chat(request, state, scoring_result)
+                    response = self._agent_loop_chat(request, state, scoring_result, intent)
+                    self._attach_intent(response, intent)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
-                    end_span(output={"mode": response.mode, "answer_source": response.answer_source})
+                    end_span(output={"mode": response.mode, "answer_source": response.answer_source, "intent": intent.intent})
                     return response
                 except Exception as exc:
-                    fallback = self._fallback_chat(request, state, scoring_result)
+                    fallback = self._fallback_chat(request, state, scoring_result, intent)
+                    self._attach_intent(fallback, intent)
                     fallback.agent_trace.append(f"agent_loop_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
-                    end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "error": str(exc)}, level="ERROR")
+                    end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent, "error": str(exc)}, level="ERROR")
                     return fallback
 
             if self.llm_client.enabled:
                 try:
-                    response = self._llm_chat(request, state, scoring_result)
+                    response = self._llm_chat(request, state, scoring_result, intent)
+                    self._attach_intent(response, intent)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
-                    end_span(output={"mode": response.mode, "answer_source": response.answer_source})
+                    end_span(output={"mode": response.mode, "answer_source": response.answer_source, "intent": intent.intent})
                     return response
                 except Exception as exc:
-                    fallback = self._fallback_chat(request, state, scoring_result)
+                    fallback = self._fallback_chat(request, state, scoring_result, intent)
+                    self._attach_intent(fallback, intent)
                     fallback.agent_trace.append(f"llm_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
-                    end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "error": str(exc)}, level="ERROR")
+                    end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent, "error": str(exc)}, level="ERROR")
                     return fallback
 
-            fallback = self._fallback_chat(request, state, scoring_result)
+            fallback = self._fallback_chat(request, state, scoring_result, intent)
+            self._attach_intent(fallback, intent)
             state.messages.append({"role": "assistant", "content": fallback.assistant_message})
-            end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source})
+            end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent})
             return fallback
 
     def handle(self, request: RecommendationRequest) -> RecommendationResponse:
@@ -94,7 +104,12 @@ class PurchaseDecisionAgent:
             answer=chat_response.assistant_message,
             answer_source=chat_response.answer_source,
             agent_trace=chat_response.agent_trace,
+            intent=chat_response.intent,
         )
+
+    def _attach_intent(self, response: ChatResponse, intent: IntentResult) -> None:
+        response.intent = intent
+        response.agent_trace.insert(0, f"intent:{intent.intent}")
 
     def _update_candidates(self, state: ConversationState, candidate_products: list[str]) -> None:
         if not candidate_products:
@@ -122,6 +137,7 @@ class PurchaseDecisionAgent:
         request: ChatRequest,
         state: ConversationState,
         scoring_result: RecommendationResult | None,
+        intent: IntentResult,
     ) -> ChatResponse:
         with trace_span("agent_loop", input_data={"message": request.message}) as (agent_span, end_agent_span):
             agent = build_recommend_agent(self.settings)
@@ -134,6 +150,7 @@ class PurchaseDecisionAgent:
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
                 "user_profile": state.profile.model_dump(mode="json"),
                 "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
+                "intent": intent.model_dump(mode="json"),
             }
             prompt = (
                 "当前已知信息（来自本地工具）：\n"
@@ -270,6 +287,7 @@ class PurchaseDecisionAgent:
         request: ChatRequest,
         state: ConversationState,
         scoring_result: RecommendationResult | None,
+        intent: IntentResult,
     ) -> ChatResponse:
         with trace_span("llm_chat", input_data={"message": request.message}) as (span, end_span):
             payload = {
@@ -278,6 +296,7 @@ class PurchaseDecisionAgent:
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
                 "user_profile": state.profile.model_dump(mode="json"),
                 "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
+                "intent": intent.model_dump(mode="json"),
                 "tooling_status": {
                     "product_tool": "available_mock_data",
                     "scoring_guardrail_tool": "available_reference_only",
@@ -330,6 +349,7 @@ class PurchaseDecisionAgent:
         request: ChatRequest,
         state: ConversationState,
         scoring_result: RecommendationResult | None,
+        intent: IntentResult,
     ) -> ChatResponse:
         with trace_span("fallback_chat") as (span, end_span):
             if len(state.candidate_products) < 2:

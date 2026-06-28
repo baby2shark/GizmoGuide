@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from app.schemas.intent import IntentResult
 from app.schemas.product import ProductSpec
 from app.schemas.user_profile import UserProfile
 
@@ -46,3 +47,4 @@ class RecommendationResponse(BaseModel):
     answer: str | None = None
     answer_source: str = "fallback"
     agent_trace: list[str] = Field(default_factory=list)
+    intent: IntentResult | None = None
