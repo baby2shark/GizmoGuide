@@ -16,6 +16,9 @@ class Settings:
     web_search_timeout_seconds: float = 20.0
     web_search_cache_ttl_seconds: float = 21600.0
     agent_max_tool_rounds: int = 4
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: str | None = None
+    langfuse_host: str = "http://localhost:3000"
 
     @property
     def llm_enabled(self) -> bool:
@@ -24,6 +27,10 @@ class Settings:
     @property
     def web_search_enabled(self) -> bool:
         return bool(self.bocha_api_key)
+
+    @property
+    def langfuse_enabled(self) -> bool:
+        return bool(self.langfuse_public_key and self.langfuse_secret_key)
 
 
 def load_dotenv(path: Path | None = None) -> None:
@@ -52,4 +59,7 @@ def get_settings() -> Settings:
         web_search_timeout_seconds=float(os.getenv("WEB_SEARCH_TIMEOUT_SECONDS", "20")),
         web_search_cache_ttl_seconds=float(os.getenv("WEB_SEARCH_CACHE_TTL_SECONDS", "21600")),
         agent_max_tool_rounds=int(os.getenv("AGENT_MAX_TOOL_ROUNDS", "4")),
+        langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+        langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+        langfuse_host=os.getenv("LANGFUSE_HOST", "http://localhost:3000"),
     )

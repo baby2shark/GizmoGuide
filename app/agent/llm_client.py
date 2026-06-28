@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.config.settings import Settings
+from app.tracing import trace_generation
 
 
 @dataclass
@@ -24,18 +25,35 @@ class DeepSeekClient:
         return self.settings.llm_enabled
 
     def chat_json(self, messages: list[ChatMessage], *, temperature: float = 0.2) -> dict[str, Any]:
-        if not self.settings.deepseek_api_key:
-            raise RuntimeError("DEEPSEEK_API_KEY is not configured.")
+        with trace_generation(
+            "deepseek_raw_call",
+            model=self.settings.deepseek_model,
+            input_data=[{"role": m.role, "content": m.content[:500]} for m in messages],
+            metadata={"temperature": temperature},
+        ) as (gen, end_gen):
+            if not self.settings.deepseek_api_key:
+                raise RuntimeError("DEEPSEEK_API_KEY is not configured.")
 
-        payload = {
-            "model": self.settings.deepseek_model,
-            "messages": [message.__dict__ for message in messages],
-            "temperature": temperature,
-            "response_format": {"type": "json_object"},
-        }
-        data = self._post(payload)
-        content = data["choices"][0]["message"]["content"]
-        return json.loads(content)
+            payload = {
+                "model": self.settings.deepseek_model,
+                "messages": [message.__dict__ for message in messages],
+                "temperature": temperature,
+                "response_format": {"type": "json_object"},
+            }
+            data = self._post(payload)
+            content = data["choices"][0]["message"]["content"]
+            result = json.loads(content)
+
+            usage_info = data.get("usage")
+            usage = {}
+            if usage_info:
+                usage = {
+                    "prompt_tokens": usage_info.get("prompt_tokens", 0),
+                    "completion_tokens": usage_info.get("completion_tokens", 0),
+                    "total_tokens": usage_info.get("total_tokens", 0),
+                }
+            end_gen(output=result, usage=usage if usage else None)
+            return result
 
     def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
         url = self.settings.deepseek_base_url.rstrip("/") + "/chat/completions"

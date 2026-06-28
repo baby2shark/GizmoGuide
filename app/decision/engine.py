@@ -4,33 +4,45 @@ from app.decision.weights import build_weights
 from app.schemas.product import ProductSpec
 from app.schemas.recommendation import ProductScore, RecommendationResult
 from app.schemas.user_profile import UserProfile
+from app.tracing import trace_span
 
 REPAIR_SCORE = {"low": 10.0, "medium": 7.0, "high": 4.0}
 
 
 def recommend(products: list[ProductSpec], profile: UserProfile) -> RecommendationResult:
-    if len(products) < 2:
-        raise ValueError("At least two products are required for recommendation.")
+    with trace_span(
+        "recommendation_engine",
+        input_data={"products": [p.name for p in products], "profile": profile.model_dump(mode="json")},
+    ) as (span, end_span):
+        if len(products) < 2:
+            raise ValueError("At least two products are required for recommendation.")
 
-    weights = build_weights(profile)
-    scored = [_score_product(product, profile, weights) for product in products]
-    scored.sort(key=lambda item: item.total_score, reverse=True)
+        weights = build_weights(profile)
+        scored = [_score_product(product, profile, weights) for product in products]
+        scored.sort(key=lambda item: item.total_score, reverse=True)
 
-    winner = scored[0]
-    runner_up = scored[1]
-    margin = max(0.0, winner.total_score - runner_up.total_score)
-    confidence = _confidence(profile, products, margin)
+        winner = scored[0]
+        runner_up = scored[1]
+        margin = max(0.0, winner.total_score - runner_up.total_score)
+        confidence = _confidence(profile, products, margin)
 
-    return RecommendationResult(
-        winner_id=winner.product_id,
-        winner_name=winner.product_name,
-        confidence=confidence,
-        scores=scored,
-        key_reasons=_build_key_reasons(winner, runner_up, profile),
-        risks=_build_risks(scored, profile),
-        reversal_conditions=_build_reversal_conditions(winner, runner_up, profile),
-        missing_information=_missing_information(profile),
-    )
+        result = RecommendationResult(
+            winner_id=winner.product_id,
+            winner_name=winner.product_name,
+            confidence=confidence,
+            scores=scored,
+            key_reasons=_build_key_reasons(winner, runner_up, profile),
+            risks=_build_risks(scored, profile),
+            reversal_conditions=_build_reversal_conditions(winner, runner_up, profile),
+            missing_information=_missing_information(profile),
+        )
+
+        end_span(output={
+            "winner": result.winner_name,
+            "confidence": result.confidence,
+            "scores": {s.product_name: s.total_score for s in scored},
+        })
+        return result
 
 
 def _score_product(product: ProductSpec, profile: UserProfile, weights: dict[str, float]) -> ProductScore:
