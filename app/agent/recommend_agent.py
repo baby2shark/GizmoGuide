@@ -9,6 +9,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.agent.prompts import AGENT_TOOL_SYSTEM_PROMPT
+from app.agent.schemas import AgentResponse
 from app.config.settings import Settings
 from app.tools.knowledge_search_tool import KnowledgeSearchTool
 from app.tools.web_search_tool import WebSearchTool
@@ -23,15 +24,17 @@ class RecommendDeps:
     trace: list[str] = field(default_factory=list)
 
 
-def build_recommend_agent(settings: Settings) -> Agent[RecommendDeps, str]:
+def build_recommend_agent(settings: Settings) -> Agent[RecommendDeps, AgentResponse]:
     """Build the pydantic-ai agent backed by DeepSeek's OpenAI-compatible API.
 
     Tool schema, the call loop, parameter validation and tool_call wiring are all
     handled by pydantic-ai; we only declare the tool and inject dependencies.
+    Returns structured AgentResponse instead of raw str.
     """
     agent = Agent(
         _build_model(settings),
         deps_type=RecommendDeps,
+        output_type=AgentResponse,
         system_prompt=AGENT_TOOL_SYSTEM_PROMPT,
     )
 
@@ -83,13 +86,18 @@ def build_recommend_agent(settings: Settings) -> Agent[RecommendDeps, str]:
     return agent
 
 
-def build_finisher_agent(settings: Settings) -> Agent[None, str]:
+def build_finisher_agent(settings: Settings) -> Agent[None, AgentResponse]:
     """A tool-less agent used to wrap up when the search round limit is hit.
 
     It replays the partial run's message history and answers from the evidence
     already gathered, instead of discarding everything and falling back.
+    Returns structured AgentResponse.
     """
-    return Agent(_build_model(settings))
+    return Agent(
+        _build_model(settings),
+        output_type=AgentResponse,
+        system_prompt="你是 GizmoGuide。基于已获取的信息给出回复。把给用户看的自然语言回复写在 reply 字段里。",
+    )
 
 
 def _build_model(settings: Settings) -> OpenAIChatModel:

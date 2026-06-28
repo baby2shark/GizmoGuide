@@ -11,6 +11,7 @@ from pydantic_ai.usage import UsageLimits
 from app.agent.llm_client import ChatMessage, DeepSeekClient
 from app.agent.prompts import AGENT_SYSTEM_PROMPT
 from app.agent.recommend_agent import RecommendDeps, build_finisher_agent, build_recommend_agent
+from app.agent.schemas import AgentResponse
 from app.agent.state import ConversationState, session_store
 from app.config.settings import get_settings
 from app.orchestrator.profile_extractor import extract_profile
@@ -161,7 +162,7 @@ class PurchaseDecisionAgent:
                             message_history=state.agent_messages or None,
                             usage_limits=UsageLimits(request_limit=round_limit + 1),
                         )
-                        final_text = (result.output or "").strip()
+                        agent_output: AgentResponse = result.output
                         state.agent_messages = result.all_messages()
 
                         usage_info = {}
@@ -172,29 +173,83 @@ class PurchaseDecisionAgent:
                                 "completion_tokens": getattr(u, "response_tokens", 0),
                                 "total_tokens": getattr(u, "total_tokens", 0),
                             }
-                        end_gen(output=final_text, usage=usage_info if usage_info else None)
+                        end_gen(
+                            output=agent_output.model_dump(mode="json"),
+                            usage=usage_info if usage_info else None,
+                        )
                     except UsageLimitExceeded:
                         # 触顶不丢弃证据：用无工具的收尾 agent，基于已搜到的信息直接作答。
-                        final_text = self._finish_without_tools(list(run_messages))
+                        agent_output = self._finish_without_tools(list(run_messages))
                         state.agent_messages = list(run_messages)
                         trace.append("tool_round_limit_reached")
-                        end_gen(output=final_text, metadata_extra={"reason": "round_limit_reached"})
+                        end_gen(
+                            output=agent_output.model_dump(mode="json"),
+                            metadata_extra={"reason": "round_limit_reached"},
+                        )
 
             trace.extend(deps.trace)
-            final_text = final_text or "我需要再了解一点你的购买需求。"
-            end_agent_span(output={"mode": "recommendation" if scoring_result is not None else "chat"})
+            final_text = (agent_output.reply or "").strip() or "我需要再了解一点你的购买需求。"
+
+            # Use structured output to override scoring result if agent made a decision
+            effective_scoring = scoring_result
+            if agent_output.winner_id and agent_output.confidence > 0:
+                effective_scoring = self._merge_agent_decision(scoring_result, agent_output, state)
+
+            end_agent_span(output={
+                "mode": "recommendation" if effective_scoring is not None else "chat",
+                "agent_confidence": agent_output.confidence,
+                "agent_winner": agent_output.winner_name,
+            })
             return ChatResponse(
                 session_id=state.session_id,
-                mode="recommendation" if scoring_result is not None else "chat",
+                mode="recommendation" if effective_scoring is not None else "chat",
                 assistant_message=final_text,
                 user_profile=state.profile,
                 products=state.candidate_products,
-                recommendation=scoring_result if scoring_result is not None else None,
+                recommendation=effective_scoring,
                 answer_source="agent",
                 agent_trace=trace,
             )
 
-    def _finish_without_tools(self, history: list[Any]) -> str:
+    def _merge_agent_decision(
+        self,
+        scoring_result: RecommendationResult | None,
+        agent_output: AgentResponse,
+        state: ConversationState,
+    ) -> RecommendationResult | None:
+        """Merge the agent's structured decision into the scoring result.
+
+        If a scoring result exists, overlay the agent's winner/confidence/reasons.
+        If no scoring result exists, synthesize one from the agent's decision.
+        """
+        if scoring_result is not None:
+            # Overlay agent's judgment onto existing scoring
+            score_by_id = {s.product_id: s for s in scoring_result.scores}
+            winner_id = agent_output.winner_id if agent_output.winner_id in score_by_id else scoring_result.winner_id
+            winner_name = score_by_id.get(winner_id, scoring_result.scores[0] if scoring_result.scores else None)
+            return RecommendationResult(
+                winner_id=winner_id,
+                winner_name=winner_name.product_name if hasattr(winner_name, "product_name") else str(winner_name),
+                confidence=max(0.0, min(1.0, agent_output.confidence or scoring_result.confidence)),
+                scores=scoring_result.scores,
+                key_reasons=agent_output.key_reasons or scoring_result.key_reasons,
+                risks=agent_output.risks or scoring_result.risks,
+                reversal_conditions=scoring_result.reversal_conditions,
+                missing_information=agent_output.missing_information or scoring_result.missing_information,
+            )
+        # No scoring result (e.g. < 2 candidates) — synthesize minimal result
+        return RecommendationResult(
+            winner_id=agent_output.winner_id or "",
+            winner_name=agent_output.winner_name or "",
+            confidence=agent_output.confidence,
+            scores=[],
+            key_reasons=agent_output.key_reasons,
+            risks=agent_output.risks,
+            reversal_conditions=[],
+            missing_information=agent_output.missing_information,
+        )
+
+    def _finish_without_tools(self, history: list[Any]) -> AgentResponse:
         with trace_generation(
             "finisher_agent",
             model=self.settings.deepseek_model,
@@ -206,9 +261,9 @@ class PurchaseDecisionAgent:
                 "已达到联网搜索次数上限。请基于以上已经获取到的搜索信息，直接给出对比结论和推荐，不要再尝试搜索。",
                 message_history=history or None,
             )
-            final_text = (result.output or "").strip()
-            end_gen(output=final_text)
-            return final_text
+            agent_output: AgentResponse = result.output
+            end_gen(output=agent_output.model_dump(mode="json"))
+            return agent_output
 
     def _llm_chat(
         self,

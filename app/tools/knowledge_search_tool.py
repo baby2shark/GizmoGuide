@@ -6,6 +6,7 @@ from typing import Any
 
 from app.config.settings import Settings
 from app.embedding.client import EmbeddingClient, get_embedding_client
+from app.knowledge.query_rewriter import QueryRewriter
 from app.knowledge.retrieval.pipeline import RAGPipeline
 from app.knowledge.store import KnowledgeStore
 from app.reranker.client import RerankerClient, get_reranker_client
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 class KnowledgeSearchTool:
     """RAG-powered knowledge search tool for the purchase agent.
 
-    Wraps the full RAG pipeline: dual recall → RRF → rerank.
+    Wraps the full RAG pipeline: query rewrite → dual recall → RRF → rerank.
     """
 
     name = "knowledge_search"
@@ -37,10 +38,18 @@ class KnowledgeSearchTool:
         reranker = get_reranker_client(self.settings.dashscope_api_key)
         store = KnowledgeStore(self.settings.rag_database_url)
 
+        # Build query rewriter if DeepSeek LLM is available
+        query_rewriter = None
+        if self.settings.deepseek_api_key:
+            from app.agent.llm_client import DeepSeekClient
+            llm_client = DeepSeekClient(self.settings)
+            query_rewriter = QueryRewriter(llm_client)
+
         self._pipeline = RAGPipeline(
             store=store,
             embedder=embedder,
             reranker=reranker,
+            query_rewriter=query_rewriter,
             recall_top_k=self.settings.rag_recall_top_k,
             rerank_top_n=self.settings.rag_rerank_top_n,
         )

@@ -16,13 +16,14 @@ logger = logging.getLogger(__name__)
 
 
 class RAGPipeline:
-    """Enterprise-grade RAG pipeline with dual recall, RRF fusion, and reranking."""
+    """Enterprise-grade RAG pipeline with query rewriting, dual recall, RRF fusion, and reranking."""
 
     def __init__(
         self,
         store: KnowledgeStore,
         embedder: EmbeddingClient,
         reranker: RerankerClient | None = None,
+        query_rewriter: Any | None = None,
         recall_top_k: int = 10,
         rerank_top_n: int = 5,
         rrf_k: int = 60,
@@ -30,12 +31,13 @@ class RAGPipeline:
         self.store = store
         self.embedder = embedder
         self.reranker = reranker
+        self.query_rewriter = query_rewriter
         self.recall_top_k = recall_top_k
         self.rerank_top_n = rerank_top_n
         self.rrf_k = rrf_k
 
     def search(self, query: str, category: str | None = None, top_k: int | None = None) -> list[RetrievedChunk]:
-        """Full RAG pipeline: dual recall → RRF → rerank.
+        """Full RAG pipeline: query rewrite → dual recall → RRF → rerank.
 
         Returns the top-k most relevant knowledge chunks.
         """
@@ -45,6 +47,18 @@ class RAGPipeline:
             "rag_pipeline",
             input_data={"query": query, "category": category, "top_k": effective_top_k},
         ) as (span, end_span):
+            # Step 0: Query rewriting (optional)
+            original_query = query
+            if self.query_rewriter is not None:
+                rewritten_query, detected_category = self.query_rewriter.rewrite(query)
+                query = rewritten_query
+                if category is None and detected_category:
+                    category = detected_category
+                logger.info(
+                    "Query rewritten: '%s' → '%s' (category=%s)",
+                    original_query, rewritten_query, category,
+                )
+
             # Step 1: Dual recall
             bm25_results, vector_results = dual_recall(
                 self.store, self.embedder, query,
@@ -78,6 +92,10 @@ class RAGPipeline:
                 output={
                     "result_count": len(final),
                     "stages": stage,
+                    "query_rewritten": original_query != query,
+                    "original_query": original_query,
+                    "search_query": query,
+                    "category": category,
                     "results": [
                         {"id": r.chunk_id, "title": r.title, "score": round(r.score, 4), "path": r.retrieval_path}
                         for r in final
