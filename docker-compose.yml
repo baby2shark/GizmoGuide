@@ -25,6 +25,14 @@ services:
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
       LANGFUSE_HOST: ${LANGFUSE_HOST:-http://langfuse-web:3000}
+      # RAG / DashScope
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      DASHSCOPE_EMBEDDING_MODEL: ${DASHSCOPE_EMBEDDING_MODEL:-text-embedding-v3}
+      DASHSCOPE_RERANK_MODEL: ${DASHSCOPE_RERANK_MODEL:-gte-rerank}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1024}
+      RAG_DATABASE_URL: ${RAG_DATABASE_URL:-postgresql://langfuse:langfuse@postgres:5432/langfuse}
+      RAG_RECALL_TOP_K: ${RAG_RECALL_TOP_K:-10}
+      RAG_RERANK_TOP_N: ${RAG_RERANK_TOP_N:-5}
       # Override host proxy - 127.0.0.1 inside container != host machine
       HTTP_PROXY: ""
       HTTPS_PROXY: ""
@@ -33,6 +41,8 @@ services:
       NO_PROXY: "*"
     depends_on:
       langfuse-web:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   # ---- Shared Infrastructure ----

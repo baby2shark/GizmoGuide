@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -9,6 +10,9 @@ from fastapi.staticfiles import StaticFiles
 from app.api.chat import router as chat_router
 from app.api.products import router as products_router
 from app.api.recommend import router as recommend_router
+from app.config.settings import get_settings
+
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = ROOT_DIR / "frontend"
@@ -20,6 +24,20 @@ app.include_router(recommend_router)
 
 if FRONTEND_DIR.exists():
     app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
+
+
+@app.on_event("startup")
+def _ensure_rag_schema() -> None:
+    """Create knowledge_base table if it doesn't exist (idempotent)."""
+    try:
+        settings = get_settings()
+        if settings.rag_enabled:
+            from app.knowledge.store import KnowledgeStore
+            store = KnowledgeStore(settings.rag_database_url)
+            store.ensure_schema()
+            logger.info("RAG schema ensured")
+    except Exception as exc:
+        logger.warning("RAG schema init skipped: %s", exc)
 
 
 @app.get("/health")

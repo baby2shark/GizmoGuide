@@ -19,6 +19,14 @@ class Settings:
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None
     langfuse_host: str = "http://localhost:3000"
+    # RAG / DashScope
+    dashscope_api_key: str | None = None
+    dashscope_embedding_model: str = "text-embedding-v3"
+    dashscope_rerank_model: str = "gte-rerank"
+    embedding_dimensions: int = 1024
+    rag_database_url: str = "postgresql://langfuse:langfuse@postgres:5432/langfuse"
+    rag_recall_top_k: int = 10
+    rag_rerank_top_n: int = 5
 
     @property
     def llm_enabled(self) -> bool:
@@ -31,6 +39,10 @@ class Settings:
     @property
     def langfuse_enabled(self) -> bool:
         return bool(self.langfuse_public_key and self.langfuse_secret_key)
+
+    @property
+    def rag_enabled(self) -> bool:
+        return bool(self.dashscope_api_key and self.rag_database_url)
 
 
 def load_dotenv(path: Path | None = None) -> None:
@@ -62,4 +74,11 @@ def get_settings() -> Settings:
         langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
         langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
         langfuse_host=os.getenv("LANGFUSE_HOST", "http://localhost:3000"),
+        dashscope_api_key=os.getenv("DASHSCOPE_API_KEY"),
+        dashscope_embedding_model=os.getenv("DASHSCOPE_EMBEDDING_MODEL", "text-embedding-v3"),
+        dashscope_rerank_model=os.getenv("DASHSCOPE_RERANK_MODEL", "gte-rerank"),
+        embedding_dimensions=int(os.getenv("EMBEDDING_DIMENSIONS", "1024")),
+        rag_database_url=os.getenv("RAG_DATABASE_URL", "postgresql://langfuse:langfuse@postgres:5432/langfuse"),
+        rag_recall_top_k=int(os.getenv("RAG_RECALL_TOP_K", "10")),
+        rag_rerank_top_n=int(os.getenv("RAG_RERANK_TOP_N", "5")),
     )
