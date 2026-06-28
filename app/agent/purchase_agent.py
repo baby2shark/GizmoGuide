@@ -45,7 +45,13 @@ class PurchaseDecisionAgent:
             state = session_store.get(request.session_id)
             self._update_candidates(state, request.candidate_products)
             known_candidates = request.candidate_products or [product.id for product in state.candidate_products]
-            intent = self.intent_classifier.classify(request.message, known_candidates)
+            intent = self.intent_classifier.classify(
+                request.message,
+                known_candidates,
+                recent_messages=state.messages[-6:],
+                last_intent=state.last_intent,
+            )
+            state.last_intent = intent
             state.profile = extract_profile(request.message, state.profile)
             state.messages.append({"role": "user", "content": request.message})
 

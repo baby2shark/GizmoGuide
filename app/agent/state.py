@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.schemas.intent import IntentResult
 from app.schemas.product import ProductSpec
 from app.schemas.user_profile import UserProfile
 
@@ -14,6 +15,7 @@ class ConversationState:
     profile: UserProfile = field(default_factory=UserProfile)
     messages: list[dict[str, str]] = field(default_factory=list)
     agent_messages: list[Any] = field(default_factory=list)
+    last_intent: IntentResult | None = None
 
 
 class InMemorySessionStore:
