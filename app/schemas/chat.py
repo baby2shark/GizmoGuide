@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.schemas.intent import IntentResult
+from app.memory.models import SessionSummary
 from app.schemas.product import ProductSpec
 from app.schemas.recommendation import RecommendationResult
 from app.schemas.user_profile import UserProfile
@@ -26,3 +27,4 @@ class ChatResponse(BaseModel):
     answer_source: str = "fallback"
     agent_trace: list[str] = Field(default_factory=list)
     intent: IntentResult | None = None
+    memory_context: SessionSummary | None = None

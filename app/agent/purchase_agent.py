@@ -15,6 +15,7 @@ from app.agent.recommend_agent import RecommendDeps, build_finisher_agent, build
 from app.agent.schemas import AgentResponse
 from app.agent.state import ConversationState, session_store
 from app.config.settings import get_settings
+from app.memory import memory_manager
 from app.orchestrator.profile_extractor import extract_profile
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.schemas.intent import IntentResult
@@ -43,6 +44,10 @@ class PurchaseDecisionAgent:
             input_data={"message": request.message, "session_id": request.session_id},
         ) as (span, end_span):
             state = session_store.get(request.session_id)
+            memory_context = memory_manager.get_context(request.session_id, state.profile)
+            state.profile = memory_context.profile
+            state.memory_summary = memory_context.summary
+            memory_manager.remember_user_message(request.session_id, request.message)
             self._update_candidates(state, request.candidate_products)
             known_candidates = request.candidate_products or [product.id for product in state.candidate_products]
             intent = self.intent_classifier.classify(
@@ -52,21 +57,30 @@ class PurchaseDecisionAgent:
                 last_intent=state.last_intent,
             )
             state.last_intent = intent
+            memory_manager.remember_intent(request.session_id, intent)
             state.profile = extract_profile(request.message, state.profile)
+            memory_manager.remember_profile(request.session_id, state.profile)
             state.messages.append({"role": "user", "content": request.message})
 
             scoring_result = self._try_scoring(state)
+            state.memory_summary = memory_manager.compress(
+                request.session_id,
+                profile=state.profile,
+                candidates=state.candidate_products,
+                intent=intent,
+            )
 
             if self.llm_client.enabled and (self.web_search_tool.enabled or self.knowledge_search_tool.enabled):
                 try:
                     response = self._agent_loop_chat(request, state, scoring_result, intent)
-                    self._attach_intent(response, intent)
+                    self._finalize_response(response, state, intent)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source, "intent": intent.intent})
                     return response
                 except Exception as exc:
                     fallback = self._fallback_chat(request, state, scoring_result, intent)
-                    self._attach_intent(fallback, intent)
+                    memory_manager.remember_fallback(request.session_id, f"agent_loop_failed:{type(exc).__name__}")
+                    self._finalize_response(fallback, state, intent)
                     fallback.agent_trace.append(f"agent_loop_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
                     end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent, "error": str(exc)}, level="ERROR")
@@ -75,20 +89,21 @@ class PurchaseDecisionAgent:
             if self.llm_client.enabled:
                 try:
                     response = self._llm_chat(request, state, scoring_result, intent)
-                    self._attach_intent(response, intent)
+                    self._finalize_response(response, state, intent)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source, "intent": intent.intent})
                     return response
                 except Exception as exc:
                     fallback = self._fallback_chat(request, state, scoring_result, intent)
-                    self._attach_intent(fallback, intent)
+                    memory_manager.remember_fallback(request.session_id, f"llm_failed:{type(exc).__name__}")
+                    self._finalize_response(fallback, state, intent)
                     fallback.agent_trace.append(f"llm_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
                     end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent, "error": str(exc)}, level="ERROR")
                     return fallback
 
             fallback = self._fallback_chat(request, state, scoring_result, intent)
-            self._attach_intent(fallback, intent)
+            self._finalize_response(fallback, state, intent)
             state.messages.append({"role": "assistant", "content": fallback.assistant_message})
             end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "intent": intent.intent})
             return fallback
@@ -117,6 +132,23 @@ class PurchaseDecisionAgent:
         response.intent = intent
         response.agent_trace.insert(0, f"intent:{intent.intent}")
 
+    def _finalize_response(self, response: ChatResponse, state: ConversationState, intent: IntentResult) -> None:
+        self._attach_intent(response, intent)
+        memory_manager.remember_recommendation(state.session_id, response.recommendation)
+        memory_manager.remember_assistant_message(
+            state.session_id,
+            response.assistant_message,
+            response.answer_source,
+        )
+        state.memory_summary = memory_manager.compress(
+            state.session_id,
+            profile=state.profile,
+            candidates=state.candidate_products,
+            intent=intent,
+        )
+        response.memory_context = state.memory_summary
+        response.agent_trace.append("used_memory_context_harness")
+
     def _update_candidates(self, state: ConversationState, candidate_products: list[str]) -> None:
         if not candidate_products:
             return
@@ -124,6 +156,11 @@ class PurchaseDecisionAgent:
             products, missing = self.product_tool.get_products(candidate_products)
             if products:
                 state.candidate_products = products
+                memory_manager.remember_tool_evidence(
+                    state.session_id,
+                    "product_lookup",
+                    f"loaded {len(products)} candidate products",
+                )
             end_span(output={"found": len(products), "missing": missing})
 
     def _try_scoring(self, state: ConversationState) -> RecommendationResult | None:
@@ -132,6 +169,11 @@ class PurchaseDecisionAgent:
         with trace_span("scoring_engine", input_data={"products": [p.name for p in state.candidate_products]}) as (span, end_span):
             try:
                 result = self.scoring_tool.evaluate(state.candidate_products, state.profile)
+                memory_manager.remember_tool_evidence(
+                    state.session_id,
+                    "scoring_guardrail",
+                    f"winner={result.winner_name}, confidence={result.confidence}",
+                )
                 end_span(output={"winner": result.winner_name, "confidence": result.confidence})
                 return result
             except Exception as exc:
@@ -155,6 +197,7 @@ class PurchaseDecisionAgent:
             context_payload = {
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
                 "user_profile": state.profile.model_dump(mode="json"),
+                "memory_context": state.memory_summary.model_dump(mode="json"),
                 "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
                 "intent": intent.model_dump(mode="json"),
             }
@@ -232,6 +275,7 @@ class PurchaseDecisionAgent:
                 recommendation=effective_scoring,
                 answer_source="agent",
                 agent_trace=trace,
+                memory_context=state.memory_summary,
             )
 
     def _merge_agent_decision(
@@ -301,6 +345,7 @@ class PurchaseDecisionAgent:
                 "conversation_history": state.messages[-8:],
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
                 "user_profile": state.profile.model_dump(mode="json"),
+                "memory_context": state.memory_summary.model_dump(mode="json"),
                 "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
                 "intent": intent.model_dump(mode="json"),
                 "tooling_status": {
@@ -332,6 +377,7 @@ class PurchaseDecisionAgent:
                 recommendation=recommendation,
                 answer_source="llm",
                 agent_trace=["used_agent", "used_product_tool", "used_scoring_guardrail_tool", "used_deepseek"],
+                memory_context=state.memory_summary,
             )
 
     def _recommendation_from_llm(self, data: dict[str, Any], fallback: RecommendationResult) -> RecommendationResult:
@@ -381,6 +427,7 @@ class PurchaseDecisionAgent:
                 recommendation=recommendation,
                 answer_source="fallback",
                 agent_trace=["used_agent", "used_product_tool", "used_scoring_guardrail_tool", "llm_disabled"],
+                memory_context=state.memory_summary,
             )
 
     def _profile_has_enough_signal(self, state: ConversationState) -> bool:
