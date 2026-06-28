@@ -3,6 +3,7 @@
 import re
 
 from app.schemas.user_profile import Scenario, UserProfile
+from app.tracing import trace_span
 
 SCENARIO_KEYWORDS: list[tuple[Scenario, tuple[str, ...]]] = [
     (Scenario.photo, ("拍照", "摄影", "影像", "相机", "人像", "视频", "vlog")),
@@ -16,44 +17,46 @@ SCENARIO_KEYWORDS: list[tuple[Scenario, tuple[str, ...]]] = [
 
 
 def extract_profile(message: str, existing: UserProfile | None = None) -> UserProfile:
-    profile = existing.model_copy(deep=True) if existing else UserProfile()
-    text = message.lower()
+    with trace_span("profile_extraction", input_data={"message": message[:200]}) as (span, end_span):
+        profile = existing.model_copy(deep=True) if existing else UserProfile()
+        text = message.lower()
 
-    budget = _extract_budget(text)
-    if budget is not None:
-        profile.budget = budget
+        budget = _extract_budget(text)
+        if budget is not None:
+            profile.budget = budget
 
-    years = _extract_usage_years(text)
-    if years is not None:
-        profile.usage_years = years
+        years = _extract_usage_years(text)
+        if years is not None:
+            profile.usage_years = years
 
-    scenarios = set(profile.primary_scenarios)
-    for scenario, keywords in SCENARIO_KEYWORDS:
-        if any(keyword in text for keyword in keywords):
-            scenarios.add(scenario)
-    profile.primary_scenarios = list(scenarios)
+        scenarios = set(profile.primary_scenarios)
+        for scenario, keywords in SCENARIO_KEYWORDS:
+            if any(keyword in text for keyword in keywords):
+                scenarios.add(scenario)
+        profile.primary_scenarios = list(scenarios)
 
-    if any(word in text for word in ("苹果", "iphone", "ios")):
-        profile.os_preference = "ios"
-    elif any(word in text for word in ("安卓", "android", "鸿蒙")):
-        profile.os_preference = "android"
+        if any(word in text for word in ("苹果", "iphone", "ios")):
+            profile.os_preference = "ios"
+        elif any(word in text for word in ("安卓", "android", "鸿蒙")):
+            profile.os_preference = "android"
 
-    if any(word in text for word in ("维修", "售后", "修", "耐用", "用久")):
-        profile.repair_sensitivity = "high"
-    if any(word in text for word in ("风险低", "稳", "稳定", "别翻车")):
-        profile.risk_tolerance = "low"
-    if any(word in text for word in ("便宜", "预算紧", "省钱", "性价比")):
-        profile.budget_flexibility = "low"
+        if any(word in text for word in ("维修", "售后", "修", "耐用", "用久")):
+            profile.repair_sensitivity = "high"
+        if any(word in text for word in ("风险低", "稳", "稳定", "别翻车")):
+            profile.risk_tolerance = "low"
+        if any(word in text for word in ("便宜", "预算紧", "省钱", "性价比")):
+            profile.budget_flexibility = "low"
 
-    storage = _extract_storage(text)
-    if storage is not None:
-        profile.min_storage_gb = storage
+        storage = _extract_storage(text)
+        if storage is not None:
+            profile.min_storage_gb = storage
 
-    weight = _extract_weight_limit(text)
-    if weight is not None:
-        profile.max_weight_g = weight
+        weight = _extract_weight_limit(text)
+        if weight is not None:
+            profile.max_weight_g = weight
 
-    return profile
+        end_span(output=profile.model_dump(mode="json"))
+        return profile
 
 
 def build_clarification_questions(profile: UserProfile) -> list[dict[str, str]]:

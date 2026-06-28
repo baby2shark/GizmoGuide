@@ -11,6 +11,7 @@ from typing import Any
 import certifi
 
 from app.config.settings import Settings
+from app.tracing import trace_span
 
 TOOL_NAME = "web_search"
 
@@ -38,32 +39,41 @@ class WebSearchTool:
         Always returns a dict with a ``status`` field so the agent loop can
         feed errors back to the model instead of crashing.
         """
-        query = (query or "").strip()
-        if not query:
-            return {"status": "error", "error": "query 不能为空", "hint": "请提供商品名和关注维度。"}
+        with trace_span("web_search", input_data={"query": query, "count": count}) as (span, end_span):
+            query = (query or "").strip()
+            if not query:
+                result = {"status": "error", "error": "query 不能为空", "hint": "请提供商品名和关注维度。"}
+                end_span(output=result, level="WARNING")
+                return result
 
-        count = max(1, min(int(count or 6), 10))
-        cache_key = f"{query}::{count}"
+            count = max(1, min(int(count or 6), 10))
+            cache_key = f"{query}::{count}"
 
-        cached = self._cache.get(cache_key)
-        if cached and cached.expires_at > time.monotonic():
-            return {**cached.payload, "cached": True}
+            cached = self._cache.get(cache_key)
+            if cached and cached.expires_at > time.monotonic():
+                result = {**cached.payload, "cached": True}
+                end_span(output={"status": "ok", "cached": True, "result_count": cached.payload.get("result_count", 0)})
+                return result
 
-        try:
-            raw = self._call_bocha(query, count)
-        except Exception as exc:  # noqa: BLE001 - surface as structured error to the model
-            return {
-                "status": "error",
-                "error": f"联网搜索失败：{type(exc).__name__}",
-                "hint": "可以换个关键词重试，或先基于已有信息回答并说明未拿到联网证据。",
-            }
+            try:
+                raw = self._call_bocha(query, count)
+            except Exception as exc:  # noqa: BLE001 - surface as structured error to the model
+                result = {
+                    "status": "error",
+                    "error": f"联网搜索失败：{type(exc).__name__}",
+                    "hint": "可以换个关键词重试，或先基于已有信息回答并说明未拿到联网证据。",
+                }
+                end_span(output=result, level="ERROR")
+                return result
 
-        payload = self._summarize(query, raw)
-        self._cache[cache_key] = _CacheEntry(
-            expires_at=time.monotonic() + self.settings.web_search_cache_ttl_seconds,
-            payload=payload,
-        )
-        return {**payload, "cached": False}
+            payload = self._summarize(query, raw)
+            self._cache[cache_key] = _CacheEntry(
+                expires_at=time.monotonic() + self.settings.web_search_cache_ttl_seconds,
+                payload=payload,
+            )
+            result = {**payload, "cached": False}
+            end_span(output={"status": "ok", "cached": False, "result_count": payload.get("result_count", 0), "results": payload.get("results", [])[:3]})
+            return result
 
     def _call_bocha(self, query: str, count: int) -> dict[str, Any]:
         if not self.settings.bocha_api_key:
