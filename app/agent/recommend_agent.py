@@ -10,6 +10,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.agent.prompts import AGENT_TOOL_SYSTEM_PROMPT
 from app.config.settings import Settings
+from app.tools.knowledge_search_tool import KnowledgeSearchTool
 from app.tools.web_search_tool import WebSearchTool
 
 
@@ -18,6 +19,7 @@ class RecommendDeps:
     """Runtime dependencies injected into the agent's tools."""
 
     web_search_tool: WebSearchTool
+    knowledge_search_tool: KnowledgeSearchTool | None = None
     trace: list[str] = field(default_factory=list)
 
 
@@ -52,6 +54,31 @@ def build_recommend_agent(settings: Settings) -> Agent[RecommendDeps, str]:
         """
         ctx.deps.trace.append("called:web_search")
         return ctx.deps.web_search_tool.run(query=query, count=count)
+
+    @agent.tool
+    def knowledge_search(
+        ctx: RunContext[RecommendDeps],
+        query: Annotated[
+            str,
+            Field(description="关于产品选购、品牌对比、价格分析、售后政策的自然语言问题，例如 '蓝牙耳机怎么选' 或 '机械键盘轴体对比'。"),
+        ],
+        category: Annotated[
+            str | None,
+            Field(description="可选的商品品类过滤，如 '蓝牙耳机'、'机械键盘'、'投影仪'、'显示器'。留空则搜索全部品类。"),
+        ] = None,
+        top_k: Annotated[
+            int,
+            Field(description="返回知识条数，1-10，默认 5。", ge=1, le=10),
+        ] = 5,
+    ) -> dict[str, Any]:
+        """搜索私域知识库，获取选购指南、品牌分析、性价比矩阵、售后政策、专家避坑建议等专业领域知识。
+
+        这些知识是结构化经验数据，联网搜索拿不到。当你需要回答选购建议、品牌对比、价格区间分析时调用。
+        """
+        ctx.deps.trace.append("called:knowledge_search")
+        if ctx.deps.knowledge_search_tool is None or not ctx.deps.knowledge_search_tool.enabled:
+            return {"status": "disabled", "result_count": 0, "results": []}
+        return ctx.deps.knowledge_search_tool.search(query=query, category=category, top_k=top_k)
 
     return agent
 

@@ -18,6 +18,7 @@ from app.schemas.chat import ChatRequest, ChatResponse
 from app.schemas.recommendation import RecommendationRequest, RecommendationResponse, RecommendationResult
 from app.tools.product_tool import ProductTool
 from app.tools.scoring_tool import ScoringTool
+from app.tools.knowledge_search_tool import KnowledgeSearchTool
 from app.tools.web_search_tool import WebSearchTool
 from app.tracing import trace_span, trace_generation
 
@@ -30,6 +31,7 @@ class PurchaseDecisionAgent:
         self.product_tool = ProductTool()
         self.scoring_tool = ScoringTool()
         self.web_search_tool = WebSearchTool(settings)
+        self.knowledge_search_tool = KnowledgeSearchTool(settings)
 
     def chat(self, request: ChatRequest) -> ChatResponse:
         with trace_span(
@@ -43,7 +45,7 @@ class PurchaseDecisionAgent:
 
             scoring_result = self._try_scoring(state)
 
-            if self.llm_client.enabled and self.web_search_tool.enabled:
+            if self.llm_client.enabled and (self.web_search_tool.enabled or self.knowledge_search_tool.enabled):
                 try:
                     response = self._agent_loop_chat(request, state, scoring_result)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
@@ -122,7 +124,10 @@ class PurchaseDecisionAgent:
     ) -> ChatResponse:
         with trace_span("agent_loop", input_data={"message": request.message}) as (agent_span, end_agent_span):
             agent = build_recommend_agent(self.settings)
-            deps = RecommendDeps(web_search_tool=self.web_search_tool)
+            deps = RecommendDeps(
+                web_search_tool=self.web_search_tool,
+                knowledge_search_tool=self.knowledge_search_tool,
+            )
 
             context_payload = {
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
