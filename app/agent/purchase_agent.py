@@ -14,11 +14,11 @@ from app.agent.recommend_agent import RecommendDeps, build_finisher_agent, build
 from app.agent.schemas import AgentResponse
 from app.agent.state import ConversationState, long_term_memory_store, session_store
 from app.config.settings import get_settings
-from app.orchestrator.long_term_memory_extractor import extract_preference_memory, merge_profiles
-from app.orchestrator.profile_extractor import extract_profile
+from app.orchestrator.long_term_memory_extractor import merge_profiles
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.schemas.long_term_memory import LongTermMemory
 from app.schemas.recommendation import RecommendationRequest, RecommendationResponse, RecommendationResult
+from app.tools.memory_fork_tool import MemoryForkTool
 from app.tools.product_tool import ProductTool
 from app.tools.scoring_tool import ScoringTool
 from app.tools.knowledge_search_tool import KnowledgeSearchTool
@@ -35,6 +35,7 @@ class PurchaseDecisionAgent:
         self.scoring_tool = ScoringTool()
         self.web_search_tool = WebSearchTool(settings)
         self.knowledge_search_tool = KnowledgeSearchTool(settings)
+        self.memory_fork_tool = MemoryForkTool(settings)
 
     def chat(self, request: ChatRequest) -> ChatResponse:
         with trace_span(
@@ -46,10 +47,11 @@ class PurchaseDecisionAgent:
             state = session_store.get(request.session_id)
             state.user_id = user_id
             state.profile = merge_profiles(memory.profile_memory, state.profile)
+            state.profile = merge_profiles(state.profile, request.profile)
             self._update_candidates(state, request.candidate_products)
-            state.profile = extract_profile(request.message, state.profile)
-            memory.preference_memory = extract_preference_memory(request.message, memory.preference_memory)
-            memory.profile_memory = merge_profiles(memory.profile_memory, state.profile)
+            memory = self.memory_fork_tool.extract(request.message, memory, state.profile)
+            state.profile = merge_profiles(state.profile, memory.profile_memory)
+            long_term_memory_store.save(memory)
             state.messages.append({"role": "user", "content": request.message})
 
             scoring_result = self._try_scoring(state)
@@ -58,12 +60,14 @@ class PurchaseDecisionAgent:
                 try:
                     response = self._agent_loop_chat(request, state, scoring_result)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
+                    session_store.save(state)
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source})
                     return response
                 except Exception as exc:
                     fallback = self._fallback_chat(request, state, scoring_result)
                     fallback.agent_trace.append(f"agent_loop_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
+                    session_store.save(state)
                     end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "error": str(exc)}, level="ERROR")
                     return fallback
 
@@ -71,17 +75,20 @@ class PurchaseDecisionAgent:
                 try:
                     response = self._llm_chat(request, state, scoring_result)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
+                    session_store.save(state)
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source})
                     return response
                 except Exception as exc:
                     fallback = self._fallback_chat(request, state, scoring_result)
                     fallback.agent_trace.append(f"llm_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
+                    session_store.save(state)
                     end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "error": str(exc)}, level="ERROR")
                     return fallback
 
             fallback = self._fallback_chat(request, state, scoring_result)
             state.messages.append({"role": "assistant", "content": fallback.assistant_message})
+            session_store.save(state)
             end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source})
             return fallback
 
@@ -91,6 +98,7 @@ class PurchaseDecisionAgent:
                 session_id=f"recommendation-compat-{uuid4().hex}",
                 user_id=request.user_id,
                 message=request.user_message,
+                profile=request.profile,
                 candidate_products=request.candidate_products,
             )
         )

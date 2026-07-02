@@ -27,6 +27,10 @@ class Settings:
     rag_database_url: str = "postgresql://langfuse:langfuse@postgres:5432/langfuse"
     rag_recall_top_k: int = 10
     rag_rerank_top_n: int = 5
+    # Session / long-term memory
+    redis_url: str | None = None
+    session_ttl_seconds: int = 86400
+    long_term_memory_ttl_seconds: int = 15552000
 
     @property
     def llm_enabled(self) -> bool:
@@ -81,4 +85,7 @@ def get_settings() -> Settings:
         rag_database_url=os.getenv("RAG_DATABASE_URL", "postgresql://langfuse:langfuse@postgres:5432/langfuse"),
         rag_recall_top_k=int(os.getenv("RAG_RECALL_TOP_K", "10")),
         rag_rerank_top_n=int(os.getenv("RAG_RERANK_TOP_N", "5")),
+        redis_url=os.getenv("REDIS_URL"),
+        session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "86400")),
+        long_term_memory_ttl_seconds=int(os.getenv("LONG_TERM_MEMORY_TTL_SECONDS", "15552000")),
     )
