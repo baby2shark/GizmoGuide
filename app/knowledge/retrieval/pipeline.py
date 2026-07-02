@@ -42,16 +42,6 @@ class RAGPipeline:
 
         Returns the top-k most relevant knowledge chunks.
         """
-        chunks, _debug = self.search_with_debug(query, category=category, top_k=top_k)
-        return chunks
-
-    def search_with_debug(
-        self,
-        query: str,
-        category: str | None = None,
-        top_k: int | None = None,
-    ) -> tuple[list[RetrievedChunk], RAGDebugSnapshot]:
-        """Run the full RAG pipeline and return both final chunks and debug snapshot."""
         effective_top_k = top_k or self.rerank_top_n
         snapshot = RAGDebugSnapshot(
             original_query=query,
@@ -95,7 +85,7 @@ class RAGPipeline:
             if not bm25_results and not vector_results:
                 snapshot.stages.append("dual_recall_empty")
                 end_span(output=snapshot.to_trace_summary())
-                return [], snapshot
+                return []
 
             # Step 2: RRF fusion
             snapshot.stages.append("rrf")
@@ -108,7 +98,7 @@ class RAGPipeline:
             if not fused:
                 snapshot.stages.append("rrf_empty")
                 end_span(output=snapshot.to_trace_summary())
-                return [], snapshot
+                return []
 
             # Step 3: Reranking (if reranker is available)
             if self.reranker and len(fused) > 1:
@@ -135,7 +125,7 @@ class RAGPipeline:
                 output={"result_count": len(final), "stage_summary": stage, **snapshot.to_trace_summary()},
             )
 
-            return final, snapshot
+            return final
 
     def _rerank(self, query: str, candidates: list[RetrievedChunk]) -> list[RetrievedChunk]:
         """Apply cross-encoder reranking to the fused candidate list."""
