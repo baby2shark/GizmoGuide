@@ -406,6 +406,43 @@ h1, h2, h3, p { margin-top: 0; }
 .typing span:nth-child(3) { animation-delay: 0.24s; }
 @keyframes pulse { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
 
+.stream-steps {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stream-step {
+  width: fit-content;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.stream-step-tool_start,
+.stream-step-scoring {
+  border-color: rgba(91, 34, 255, 0.24);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.stream-step-tool_result,
+.stream-step-memory {
+  border-color: rgba(24, 121, 78, 0.18);
+  background: rgba(24, 121, 78, 0.08);
+  color: var(--green);
+}
+
+.stream-typing {
+  margin-top: 2px;
+}
+
 .composer {
   position: fixed;
   left: 50%;
