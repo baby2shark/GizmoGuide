@@ -7,6 +7,7 @@ from app.schemas.user_profile import UserProfile
 
 
 class RecommendationRequest(BaseModel):
+    user_id: str | None = None
     user_message: str
     candidate_products: list[str] = Field(min_length=2, max_length=5)
     profile: UserProfile | None = None

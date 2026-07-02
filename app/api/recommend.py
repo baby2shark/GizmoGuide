@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import contextvars
 
@@ -16,6 +16,7 @@ router = APIRouter(tags=["recommendation"])
 def create_recommendation(request: RecommendationRequest) -> RecommendationResponse:
     with trace_request(
         session_id=f"recommend-{request.user_message[:20]}",
+        user_id=request.user_id,
         input_data=request.model_dump(mode="json"),
         metadata={"endpoint": "/recommend"},
     ) as trace:

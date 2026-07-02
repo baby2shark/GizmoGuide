@@ -12,10 +12,12 @@ from app.agent.llm_client import ChatMessage, DeepSeekClient
 from app.agent.prompts import AGENT_SYSTEM_PROMPT
 from app.agent.recommend_agent import RecommendDeps, build_finisher_agent, build_recommend_agent
 from app.agent.schemas import AgentResponse
-from app.agent.state import ConversationState, session_store
+from app.agent.state import ConversationState, long_term_memory_store, session_store
 from app.config.settings import get_settings
+from app.orchestrator.long_term_memory_extractor import extract_preference_memory, merge_profiles
 from app.orchestrator.profile_extractor import extract_profile
 from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.long_term_memory import LongTermMemory
 from app.schemas.recommendation import RecommendationRequest, RecommendationResponse, RecommendationResult
 from app.tools.product_tool import ProductTool
 from app.tools.scoring_tool import ScoringTool
@@ -39,9 +41,15 @@ class PurchaseDecisionAgent:
             "purchase_agent_chat",
             input_data={"message": request.message, "session_id": request.session_id},
         ) as (span, end_span):
+            user_id = request.user_id or request.session_id
+            memory = long_term_memory_store.get(user_id)
             state = session_store.get(request.session_id)
+            state.user_id = user_id
+            state.profile = merge_profiles(memory.profile_memory, state.profile)
             self._update_candidates(state, request.candidate_products)
             state.profile = extract_profile(request.message, state.profile)
+            memory.preference_memory = extract_preference_memory(request.message, memory.preference_memory)
+            memory.profile_memory = merge_profiles(memory.profile_memory, state.profile)
             state.messages.append({"role": "user", "content": request.message})
 
             scoring_result = self._try_scoring(state)
@@ -81,6 +89,7 @@ class PurchaseDecisionAgent:
         chat_response = self.chat(
             ChatRequest(
                 session_id=f"recommendation-compat-{uuid4().hex}",
+                user_id=request.user_id,
                 message=request.user_message,
                 candidate_products=request.candidate_products,
             )
@@ -129,10 +138,12 @@ class PurchaseDecisionAgent:
                 web_search_tool=self.web_search_tool,
                 knowledge_search_tool=self.knowledge_search_tool,
             )
+            memory = self._get_long_term_memory(state)
 
             context_payload = {
                 "candidate_products": [product.model_dump(mode="json") for product in state.candidate_products],
                 "user_profile": state.profile.model_dump(mode="json"),
+                "long_term_memory": memory.model_dump(mode="json"),
                 "scoring_guardrail_result": scoring_result.model_dump(mode="json") if scoring_result else None,
             }
             prompt = (
@@ -202,9 +213,11 @@ class PurchaseDecisionAgent:
             })
             return ChatResponse(
                 session_id=state.session_id,
+                user_id=memory.user_id,
                 mode="recommendation" if effective_scoring is not None else "chat",
                 assistant_message=final_text,
                 user_profile=state.profile,
+                long_term_memory=memory,
                 products=state.candidate_products,
                 recommendation=effective_scoring,
                 answer_source="agent",
@@ -300,9 +313,11 @@ class PurchaseDecisionAgent:
             end_span(output={"mode": mode, "answer_source": "llm"})
             return ChatResponse(
                 session_id=state.session_id,
+                user_id=self._memory_user_id(state),
                 mode=mode,
                 assistant_message=str(data.get("assistant_message") or data.get("summary") or "我需要再了解一点你的购买需求。"),
                 user_profile=state.profile,
+                long_term_memory=self._get_long_term_memory(state),
                 products=state.candidate_products,
                 recommendation=recommendation,
                 answer_source="llm",
@@ -348,14 +363,22 @@ class PurchaseDecisionAgent:
             end_span(output={"mode": mode, "answer_source": "fallback"})
             return ChatResponse(
                 session_id=state.session_id,
+                user_id=self._memory_user_id(state),
                 mode=mode,
                 assistant_message=message,
                 user_profile=state.profile,
+                long_term_memory=self._get_long_term_memory(state),
                 products=state.candidate_products,
                 recommendation=recommendation,
                 answer_source="fallback",
                 agent_trace=["used_agent", "used_product_tool", "used_scoring_guardrail_tool", "llm_disabled"],
             )
+
+    def _memory_user_id(self, state: ConversationState) -> str:
+        return state.user_id or state.session_id
+
+    def _get_long_term_memory(self, state: ConversationState) -> LongTermMemory:
+        return long_term_memory_store.get(self._memory_user_id(state))
 
     def _profile_has_enough_signal(self, state: ConversationState) -> bool:
         profile = state.profile
