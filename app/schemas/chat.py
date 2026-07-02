@@ -14,6 +14,7 @@ class ChatRequest(BaseModel):
     session_id: str = "default"
     user_id: str | None = None
     message: str
+    profile: UserProfile | None = None
     candidate_products: list[str] = Field(default_factory=list)
 
 

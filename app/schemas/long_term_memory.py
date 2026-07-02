@@ -24,3 +24,8 @@ class LongTermMemory(BaseModel):
     user_id: str
     preference_memory: UserPreferenceMemory = Field(default_factory=UserPreferenceMemory)
     profile_memory: UserProfile = Field(default_factory=UserProfile)
+
+
+class MemoryExtractionResult(BaseModel):
+    preference_memory: UserPreferenceMemory
+    profile_memory: UserProfile
