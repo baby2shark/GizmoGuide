@@ -1,0 +1,146 @@
+[
+  {
+    "chunk_id": "phone-qa-iphone14-us-esim-001",
+    "category": "手机",
+    "title": "为什么美版 iPhone 14 系列没有实体 SIM 卡槽",
+    "content": "在美国购买的 iPhone 14、iPhone 14 Plus、iPhone 14 Pro 和 iPhone 14 Pro Max 仅支持 eSIM，不提供实体 SIM 卡槽。导购时需要明确提醒用户：如果其常用运营商、出境目的地或企业配号流程仍依赖实体 SIM，美版机器会带来开号和换卡门槛；如果运营商支持完善，则 eSIM 换机更方便。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone 14", "eSIM", "美版", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-qa-iphone-fast-charge-001",
+    "category": "手机",
+    "title": "iPhone 快充至少需要多大功率",
+    "content": "iPhone 12、iPhone SE 3 及后续机型如果想触发官方口径的快充，通常需要至少 20W 的 USB-C 电源适配器。导购解释时不要只说支持快充，还要补一句：老旧 USB-A 充电头或低功率 C 口头通常只能慢充，用户会误以为手机或电池有问题。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone 12", "iPhone 15", "iPhone 16", "快充", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-qa-samsung-smart-switch-001",
+    "category": "手机",
+    "title": "从 iPhone 换到三星 Galaxy 数据好迁移吗",
+    "content": "主流 Galaxy 新机支持通过 Smart Switch 从 iPhone 或 iPad 迁移数据，常见方式包括数据线直连、无线迁移和 iCloud 导入。知识库里这类问答的价值在于稳定回答迁移路径和限制边界：联系人、照片、视频和部分设置可迁移，但生态内购、部分聊天记录和受平台限制的数据不一定能完整同步。",
+    "tags": ["手机", "Q&A", "Samsung", "Galaxy", "换机", "数据迁移", "高可信"],
+    "source": "samsung_support"
+  },
+  {
+    "chunk_id": "phone-qa-mate60-satellite-001",
+    "category": "手机",
+    "title": "Mate 60 系列无地面网络时还能通信吗",
+    "content": "Mate 60 系列可在无地面网络覆盖时使用天通卫星通信能力，支持卫星通话和卫星消息。导购时要强调这不是“所有环境都能像蜂窝网络一样稳定”，而是一项应急能力，适合经常出野外、长途自驾或在弱覆盖地区活动的用户。",
+    "tags": ["手机", "Q&A", "Huawei", "Mate 60", "卫星通信", "高可信"],
+    "source": "huawei_support"
+  },
+  {
+    "chunk_id": "phone-qa-vivo-x200-offline-comm-001",
+    "category": "手机",
+    "title": "vivo X200 系列的无网通信到底能做什么",
+    "content": "vivo X200、X200 Pro 和 X200 Pro mini 提供无网通信能力，适合无遮挡近距离场景下的一对一沟通和 SOS 文字中继。它更像极端条件下的补位功能，不应被描述成可替代常规蜂窝网络或公网对讲系统。",
+    "tags": ["手机", "Q&A", "vivo", "X200", "无网通信", "高可信"],
+    "source": "vivo_support"
+  },
+  {
+    "chunk_id": "phone-qa-iphone-esim-prereq-001",
+    "category": "手机",
+    "title": "为什么支持 eSIM 的 iPhone 也可能开通不了 eSIM",
+    "content": "iPhone 本身支持 eSIM 只是前提之一，实际能否开通还取决于所在国家或地区、运营商是否开放、机型销售地版本以及当前系统版本是否满足要求。知识库里要固定这条口径，避免把“机型支持 eSIM”和“本地一定能开 eSIM”错误画等号。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone", "eSIM", "运营商", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-qa-synth-iphone13-used-value-001",
+    "category": "手机",
+    "title": "为什么 iPhone 13 现在仍然是常见的二手推荐机型",
+    "content": "从二手市场的实用角度看，iPhone 13 之所以长期热门，不是因为它在所有维度都强，而是因为它在性能、续航、系统支持周期、维修可得性和成交价之间比较均衡。知识库里可以把它写成稳定结论：预算有限但又想要主流 iPhone 体验的用户，往往会优先考虑 13，而不是盲目追更高代数的标准版机型。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone 13", "二手", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-ultra-vs-standard-001",
+    "category": "手机",
+    "title": "为什么同系列的 Ultra 和标准版手机不能只按芯片判断差距",
+    "content": "以 Galaxy S24 Ultra 对比 S24、小米 14 Ultra 对比小米 14、vivo X100 Pro 对比 X100 为例，同系列高配机型的差距通常不只在芯片，而在长焦、散热、屏幕规格、电池策略、充电体验和影像调校上一起拉开。知识库里应把这类问答固定下来，避免把“同系列同芯片”误解成“体验基本一样”。",
+    "tags": ["手机", "Q&A", "Samsung", "Xiaomi", "vivo", "Ultra", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-iphone15-usbc-value-001",
+    "category": "手机",
+    "title": "为什么很多用户会把 iPhone 15 当成更值得买的换代节点",
+    "content": "对很多普通用户来说，iPhone 15 的意义不只是芯片升级，而是它把灵动岛、USB-C 和更完整的主流配件兼容性带进了标准版。知识库里可以沉淀成一个稳定问答：如果用户不执着高刷和长焦，但在意接口统一、日常拍照和未来几年继续用的舒适度，iPhone 15 往往比更早的标准版更容易成为推荐起点。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone 15", "USB-C", "换代节点", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-s24-vs-s23-001",
+    "category": "手机",
+    "title": "Galaxy S24 和 S23 值不值得为新一代多花钱",
+    "content": "对很多非重度用户来说，Galaxy S24 相比 S23 的价值未必只看跑分，而更看翻译、生成式功能、屏幕亮度、续航细节和更长的软件支持周期。如果用户更重视长期系统支持和 AI 功能尝鲜，S24 更有说服力；如果更在意价格和成熟度，S23 往往仍然很能打。",
+    "tags": ["手机", "Q&A", "Samsung", "Galaxy S23", "Galaxy S24", "换代", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-xiaomi14-portability-001",
+    "category": "手机",
+    "title": "为什么小米 14 这类小屏旗舰总有人反复提名",
+    "content": "小米 14 这类机型长期被提及，不只是因为配置均衡，而是它在单手握持、主摄规格、充电速度和旗舰性能之间维持了较少妥协。知识库里适合把它写成稳定口径：对不想要超大机身、但又不愿在影像和性能上退太多的用户，小屏旗舰通常比中端大电池机更有吸引力。",
+    "tags": ["手机", "Q&A", "Xiaomi", "小米 14", "小屏旗舰", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-findx7-photo-001",
+    "category": "手机",
+    "title": "Find X7 这类影像旗舰为什么常被说更适合拍人像",
+    "content": "像 OPPO Find X7、vivo X100 Pro 这类影像旗舰，经常被用户感知为更适合拍人像，不只是镜头参数原因，还因为算法、色彩策略、长焦参与度和夜景肤色取向一起决定了最终风格。知识库里可以沉淀这类解释型问答，避免把影像差异简化成“谁像素更高谁更强”。",
+    "tags": ["手机", "Q&A", "OPPO", "Find X7", "vivo", "X100 Pro", "人像", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-k70-value-001",
+    "category": "手机",
+    "title": "Redmi K70 这类性能机为什么经常被推荐给游戏党",
+    "content": "Redmi K70 这类机型经常被推荐，不是因为它在所有方向都最强，而是因为它通常把预算集中用在性能、屏幕和充电这些对游戏党更敏感的维度上。知识库里可以固定这条问答：如果用户主要诉求是高帧游戏、日常刷视频和相对克制的预算，性能取向机型往往比影像旗舰更合适。",
+    "tags": ["手机", "Q&A", "Redmi", "K70", "游戏", "性能机", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-iphone16-standard-worth-001",
+    "category": "手机",
+    "title": "iPhone 16 标准版更适合什么样的用户",
+    "content": "如果用户希望买到更新一代的主流 iPhone，又不一定需要 Pro 级别的长焦和高刷，iPhone 16 标准版通常更适合重视系统寿命、生态兼容和拍照稳定性的用户。知识库里应把这类问答写成“适合谁”，而不是只做配置罗列。",
+    "tags": ["手机", "Q&A", "Apple", "iPhone 16", "标准版", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-s24-ultra-business-001",
+    "category": "手机",
+    "title": "Galaxy S24 Ultra 为什么常被商务和重度用户反复提及",
+    "content": "Galaxy S24 Ultra 之所以常被重度用户提及，不只是因为它是旗舰，更因为它把大屏、手写笔、长焦、续航和多任务能力放在了一台设备里。知识库里可以把它写成稳定问答：对经常开会、出差、要看文档和拍远景的人，这类 Ultra 机型的价值远大于跑分差异。",
+    "tags": ["手机", "Q&A", "Samsung", "Galaxy S24 Ultra", "商务", "长焦", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-x100-vs-x200-001",
+    "category": "手机",
+    "title": "vivo X100 和 X200 之间更该怎么选",
+    "content": "vivo X100 和 X200 的选择逻辑，通常不是“买新不买旧”这么简单，而是要看用户更在意影像风格、系统周期、外围配置还是价格落差。知识库里适合固定成一条问答：如果预算敏感，上一代高配影像旗舰常常比新一代标准版更划算，但如果更在意未来几年持续更新和新功能，X200 会更稳。",
+    "tags": ["手机", "Q&A", "vivo", "X100", "X200", "影像旗舰", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-findx7-ultra-buy-001",
+    "category": "手机",
+    "title": "Find X7 Ultra 这类超大杯影像机值不值得买",
+    "content": "Find X7 Ultra 这类超大杯影像机是否值得买，关键不在于参数看起来多夸张，而在于用户是否真的会用到长焦、人像和夜景能力。如果只是普通扫码、社交分享和轻度拍照，超大杯往往溢出；如果用户本来就习惯拍演出、旅行、夜景和人像，超大杯的价值会非常具体。",
+    "tags": ["手机", "Q&A", "OPPO", "Find X7 Ultra", "超大杯", "影像", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-qa-synth-foldable-as-main-phone-001",
+    "category": "手机",
+    "title": "折叠屏手机能不能长期当主力机",
+    "content": "折叠屏能不能长期当主力机，关键不在“能不能用”，而在用户是否接受更高的维护成本、更重的机身和更复杂的配件兼容性。知识库里适合把这条问答固定下来：如果用户追求多任务和大屏办公，折叠屏很有吸引力；如果更在意省心、耐用和二手残值，传统直板旗舰通常更稳。",
+    "tags": ["手机", "Q&A", "折叠屏", "Galaxy Z Fold", "Find N", "X Fold", "主力机", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  }
+]

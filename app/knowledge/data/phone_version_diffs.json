@@ -1,0 +1,130 @@
+[
+  {
+    "chunk_id": "phone-version-iphone15-battery-cycle-001",
+    "category": "手机",
+    "title": "iPhone 15 系列的电池耐久设计标准高于更早的 iPhone",
+    "content": "Apple 官方口径中，iPhone 15 系列的电池在理想条件下可在 1000 次完整充电循环后仍保有约 80% 容量，而 iPhone 14 及更早机型通常按 500 次完整充电循环后保有约 80% 容量来描述。导购和二手场景都可以据此解释：15 系列在长期持有和高频充放电预期上更有优势。",
+    "tags": ["手机", "版本差异", "Apple", "iPhone 15", "iPhone 14", "电池寿命", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-version-iphone14plus-camera-program-001",
+    "category": "手机",
+    "title": "iPhone 14 Plus 存在特定生产窗口的后摄预览问题服务计划",
+    "content": "Apple 为一部分在特定生产时间范围内制造的 iPhone 14 Plus 提供后置摄像头问题服务计划。这类知识非常适合写入版本差异库，因为它不是所有 14 Plus 都有问题，而是和生产窗口直接相关，二手验机时应重点确认序列号是否落在受影响范围内。",
+    "tags": ["手机", "版本差异", "Apple", "iPhone 14 Plus", "服务计划", "批次", "高可信"],
+    "source": "apple_service_program"
+  },
+  {
+    "chunk_id": "phone-version-s24ultra-region-esim-001",
+    "category": "手机",
+    "title": "Galaxy S24 Ultra 不同地区版本在 eSIM 和无线规格上可能不同",
+    "content": "Galaxy S24 Ultra 的不同销售地区版本在 eSIM 支持情况和无线频段描述上可能存在差异。知识库里要固定一条原则：跨区购买和二手流通时，不能只按同名机型判断功能，必须结合销售地区版本确认 eSIM、Wi-Fi 频段和运营商兼容性。",
+    "tags": ["手机", "版本差异", "Samsung", "Galaxy S24 Ultra", "地区版", "eSIM", "Wi-Fi", "高可信"],
+    "source": "samsung_specs"
+  },
+  {
+    "chunk_id": "phone-version-zflip6-region-sim-001",
+    "category": "手机",
+    "title": "Galaxy Z Flip6 的 SIM 形态会随地区版变化",
+    "content": "Galaxy Z Flip6 的中国大陆版本和部分海外版本在 SIM 形态上并不完全一致，部分地区版会出现 eSIM 相关支持差异。对于折叠屏这种二手流通频繁、跨区购买也较多的机型，这条版本差异知识有很高复用价值。",
+    "tags": ["手机", "版本差异", "Samsung", "Galaxy Z Flip6", "地区版", "eSIM", "高可信"],
+    "source": "samsung_specs"
+  },
+  {
+    "chunk_id": "phone-version-huawei-nearlink-hardware-001",
+    "category": "手机",
+    "title": "华为星闪能力涉及硬件支持，老机型不能只靠系统升级获得",
+    "content": "华为星闪 NearLink 不是纯软件特性，是否支持与硬件能力直接相关。知识库里应把这条固定下来：老机型即使更新到新系统，也不意味着一定能获得星闪能力，避免把“系统升级”误解为“新硬件功能下放”。",
+    "tags": ["手机", "版本差异", "Huawei", "NearLink", "星闪", "硬件能力", "高可信"],
+    "source": "huawei_support"
+  },
+  {
+    "chunk_id": "phone-version-vivo-originos6-cross-device-001",
+    "category": "手机",
+    "title": "vivo 跨端随心编等跨设备特性依赖 OriginOS 6 和配套版本",
+    "content": "vivo 的互传和跨端编辑类能力需要指定系统版本与客户端版本配合，并非所有旧机型或旧系统都天然支持。知识库里可以稳定沉淀这类版本差异：同系列机型看起来都像支持跨端协同，但真正能否使用，往往取决于系统版本、客户端版本和对端设备条件。",
+    "tags": ["手机", "版本差异", "vivo", "OriginOS 6", "互传", "跨端协同", "高可信"],
+    "source": "vivo_support"
+  },
+  {
+    "chunk_id": "phone-version-synth-iphone-pro-gap-001",
+    "category": "手机",
+    "title": "iPhone 标准版和 Pro 版的差距通常不是单一配置差异",
+    "content": "从 iPhone 13 到 iPhone 16 的主流代际里，标准版和 Pro 版之间的差距往往不是“多一个镜头”这么简单，而是会同时体现在高刷屏、长焦、视频能力、机身材料、接口速率和后续新能力支持上。知识库里可以把这类版本差异写成稳定判断：如果用户的重点是影像、剪辑或长期持有，Pro 版和标准版不应被视为同一体验层级。",
+    "tags": ["手机", "版本差异", "Apple", "iPhone 13", "iPhone 15 Pro", "iPhone 16 Pro", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-android-same-series-gap-001",
+    "category": "手机",
+    "title": "安卓同系列标准版、Pro 和 Ultra 往往对应完全不同的目标人群",
+    "content": "在 Galaxy S、Xiaomi 数字系列、vivo X 系列和 OPPO Find 系列里，同系列不同后缀机型通常会在长焦质量、主摄规格、无线充、散热、手感和续航策略上一起拉开差距。知识库里适合把这条经验沉淀下来：遇到 S24 与 S24 Ultra、小米 14 与 14 Ultra、X100 与 X100 Pro 这类问题时，不要把它们只当成存储和屏幕大小不同的版本。",
+    "tags": ["手机", "版本差异", "Samsung", "Xiaomi", "vivo", "OPPO", "Ultra", "Pro", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-iphone13-15-16-ladder-001",
+    "category": "手机",
+    "title": "iPhone 13、15、16 常被放在同一梯队比较，但推荐逻辑并不一样",
+    "content": "iPhone 13 更像价格和成熟度导向的选择，iPhone 15 更像接口和主流体验的平衡点，iPhone 16 则更偏向新功能和更长周期持有。知识库里适合把这条差异沉淀为导购框架，而不是简单回答“哪代更新哪代更值”。",
+    "tags": ["手机", "版本差异", "Apple", "iPhone 13", "iPhone 15", "iPhone 16", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-xiaomi-number-vs-k-001",
+    "category": "手机",
+    "title": "小米数字系列和 Redmi K 系列在定位上不是同一路线",
+    "content": "小米数字系列通常更强调整机质感、影像和旗舰综合体验，而 Redmi K 系列更偏向性能、屏幕和性价比。像小米 14 对比 Redmi K70 这类问题，知识库里应固定一条差异解释：它们不是“一个贵一个便宜”的关系，而是预算分配逻辑不同。",
+    "tags": ["手机", "版本差异", "Xiaomi", "小米 14", "Redmi K70", "定位差异", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-vivo-x-vs-s-001",
+    "category": "手机",
+    "title": "vivo X 系列和 S 系列的升级重点并不相同",
+    "content": "vivo X 系列通常承担品牌影像旗舰职责，S 系列则更常见于自拍、人像和更轻薄审美导向。知识库里把这条写清楚很有必要，因为很多用户只看数字大小，容易误以为同品牌新款中端和旧款旗舰可以简单互相替代。",
+    "tags": ["手机", "版本差异", "vivo", "X100", "X200", "S 系列", "定位差异", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-oppo-find-vs-reno-001",
+    "category": "手机",
+    "title": "Find 系列和 Reno 系列的升级价值应分开理解",
+    "content": "OPPO Find 系列通常对应更完整的旗舰影像和硬件规格，Reno 系列则更强调外观、人像和日常均衡。知识库里适合把 Find X7 与 Reno13 这类对比写成版本定位差异，提醒模型不要只按“新旧”排序，而忽略系列本身的任务不同。",
+    "tags": ["手机", "版本差异", "OPPO", "Find X7", "Reno13", "系列定位", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-s23-s24-ai-cycle-001",
+    "category": "手机",
+    "title": "Galaxy S23 和 S24 的代际差距更多体现在功能周期而不是单次性能跳变",
+    "content": "在很多实际购买场景里，Galaxy S23 和 S24 的差距并不只是性能，而更体现在 AI 功能、屏幕细节、软件支持年限和未来几年可用性上。知识库里适合把这条写成版本差异框架，帮助模型在“买便宜一代还是买新一代”这种问题上给出更像人的解释。",
+    "tags": ["手机", "版本差异", "Samsung", "Galaxy S23", "Galaxy S24", "AI", "系统周期", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-k70-k80-pace-001",
+    "category": "手机",
+    "title": "Redmi K70 和 K80 这类迭代更像性能平台换代而不是路线改变",
+    "content": "对 Redmi K70、K80 这类产品来说，代际更新通常更集中在性能平台、散热、屏幕和外围配置的细化上，而不是从根本上改变产品定位。知识库里沉淀这条后，模型在回答是否值得追新时就不会把它说成“完全不一样的两台手机”。",
+    "tags": ["手机", "版本差异", "Redmi", "K70", "K80", "性能平台", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-x100pro-x200pro-001",
+    "category": "手机",
+    "title": "vivo X100 Pro 和 X200 Pro 的差距更像影像旗舰成熟度迭代",
+    "content": "X100 Pro 和 X200 Pro 的选择逻辑，往往体现在长焦参与度、影像风格、系统周期和新功能成熟度，而不是单一硬件堆料。知识库里适合把它写成版本差异知识，让模型在“上一代 Pro 和新一代 Pro 怎么选”时更像在做真实导购。",
+    "tags": ["手机", "版本差异", "vivo", "X100 Pro", "X200 Pro", "影像旗舰", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-version-synth-fold-vs-flip-001",
+    "category": "手机",
+    "title": "Fold 和 Flip 不是大小不同，而是完全不同的折叠路线",
+    "content": "无论是 Galaxy Z Fold 对比 Z Flip，还是其他品牌的大折叠和小折叠，它们的差异都不是单纯屏幕尺寸，而是办公、多任务、便携、拍照姿势和耐久预期的路线差异。知识库里把这条说清楚后，折叠屏问题的回答会稳定很多。",
+    "tags": ["手机", "版本差异", "折叠屏", "Galaxy Z Fold", "Galaxy Z Flip", "大折叠", "小折叠", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  }
+]

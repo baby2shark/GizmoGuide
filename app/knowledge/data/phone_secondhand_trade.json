@@ -1,0 +1,130 @@
+[
+  {
+    "chunk_id": "phone-used-iphone-activation-lock-001",
+    "category": "手机",
+    "title": "买二手 iPhone 时首先要排查激活锁",
+    "content": "二手 iPhone 如果仍然绑定前任机主的 Apple 账户，设备可能会显示 Locked to Owner 或要求输入前任账户信息。这类机器即便价格便宜也不建议碰，因为后续正常使用、恢复、转卖都会受严重限制。验机时必须确认查找网络已关闭且激活锁已解除。",
+    "tags": ["手机", "二手交易", "Apple", "iPhone", "激活锁", "验机", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-used-iphone-parts-history-001",
+    "category": "手机",
+    "title": "二手 iPhone 的部件与维修历史是高价值验机入口",
+    "content": "支持该功能的 iPhone 可以在系统内查看部件与维修历史。如果出现 Unknown、Unverified 或二手部件提示，说明这台机器存在非正常原厂维修或更换记录，后续可能影响折抵价值、Apple Pay、Face ID、显示效果或整机稳定性。验机时这一步的价值不低于看外观。",
+    "tags": ["手机", "二手交易", "Apple", "iPhone 11", "iPhone 12", "iPhone 15", "维修历史", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-used-iphone-battery-health-001",
+    "category": "手机",
+    "title": "二手 iPhone 的电池健康度要结合是否接近 80% 来判断",
+    "content": "电池健康度接近或低于 80% 时，后续换电成本和续航体验会明显影响成交价与使用体验。知识库里可将 80% 视为一个稳定拐点：不是说 81% 就一定没问题，而是接近该阈值时必须把换电预算、使用场景和机器售价一起评估。",
+    "tags": ["手机", "二手交易", "Apple", "iPhone", "电池健康", "换电", "中高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-used-huawei-warranty-query-001",
+    "category": "手机",
+    "title": "二手华为手机可先查保修状态和权益剩余情况",
+    "content": "华为官方支持通过序列号等信息查询保修状态和设备权益。二手交易里这条信息很实用，因为它能快速辅助判断机器激活时间、是否仍在保、是否可能享受延保或特定机型服务权益，尤其适用于 Mate 和 Pura 系列这类高客单机型。",
+    "tags": ["手机", "二手交易", "Huawei", "Mate 60", "Pura 70", "保修查询", "高可信"],
+    "source": "huawei_support"
+  },
+  {
+    "chunk_id": "phone-used-oppo-activation-query-001",
+    "category": "手机",
+    "title": "二手 OPPO 手机可以先查激活时间再判断成色和剩余保修",
+    "content": "OPPO 官方提供通过 IMEI 或 SN 查询激活时间的方法。对二手交易来说，激活时间能帮助识别卖家对使用时长的描述是否可信，也能辅助判断是否仍在基础保修期内，适合应用于 Reno、Find 等主流流通机型。",
+    "tags": ["手机", "二手交易", "OPPO", "Reno13", "Find", "激活时间", "高可信"],
+    "source": "oppo_support"
+  },
+  {
+    "chunk_id": "phone-used-samsung-qualified-device-001",
+    "category": "手机",
+    "title": "三星官方折抵条件可反向当作二手机验机清单",
+    "content": "三星官方以旧换新条件通常会要求旧机能够正常开机、充电、显示、无异常关机、无锁定、无黑名单、已恢复出厂设置等。知识库里沉淀这条很有意义，因为它能直接转成通用二手机验机逻辑，帮助用户快速判断设备是否属于高风险来源。",
+    "tags": ["手机", "二手交易", "Samsung", "Galaxy", "折抵", "验机", "高可信"],
+    "source": "samsung_trade_in"
+  },
+  {
+    "chunk_id": "phone-used-synth-foldable-checklist-001",
+    "category": "手机",
+    "title": "二手折叠屏手机的验机重点不该只看外屏和成色",
+    "content": "像 Galaxy Z Flip、Z Fold、OPPO Find N、vivo X Fold 这类折叠屏，二手验机时应优先检查铰链松紧、展开平整度、内屏中轴区域、保护膜状态和多角度开合是否顺畅，而不是只盯着外壳磨损。知识库里很适合固定这条经验，因为折叠屏最贵的风险点往往藏在外观以外。",
+    "tags": ["手机", "二手交易", "折叠屏", "Galaxy Z Fold", "Galaxy Z Flip", "Find N", "X Fold", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-android-flagship-repair-history-001",
+    "category": "手机",
+    "title": "二手安卓旗舰要优先排查维修史和高热使用痕迹",
+    "content": "对小米数字旗舰、Redmi K 系列、iQOO 数字系列、Galaxy Ultra 这类性能释放较强的机型来说，二手交易时比“外观新不新”更关键的是是否存在维修史、异常发热、边充边玩重度使用痕迹和接口松动。知识库里沉淀这条很有用，因为很多机器外观漂亮，但内部老化和热损耗已经开始影响稳定性。",
+    "tags": ["手机", "二手交易", "Xiaomi 14", "Redmi K70", "Galaxy S24 Ultra", "iQOO", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-iphone13-safe-zone-001",
+    "category": "手机",
+    "title": "二手 iPhone 13 常被视为相对稳妥的甜点位，但也要防高电量低健康假象",
+    "content": "iPhone 13 在二手市场常被当作甜点位，但验机时不能只看当前电量充得满不满，还要看电池健康、循环习惯、是否异常发热以及维修历史。有些机器短时间看起来续航还行，但健康度已经接近换电阈值，后续使用成本会很快暴露出来。",
+    "tags": ["手机", "二手交易", "Apple", "iPhone 13", "电池健康", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-android-camera-bump-drop-001",
+    "category": "手机",
+    "title": "大镜头模组手机二手验机时要特别看对焦和防抖状态",
+    "content": "像小米 14 Ultra、vivo X100 Pro、Find X7 Ultra、Galaxy S24 Ultra 这类大模组影像旗舰，跌落后最容易留下的并不一定是机身大伤，而是长焦或主摄对焦异响、微距切换异常和视频防抖不稳。知识库里适合把这条作为高频二手验机经验沉淀下来。",
+    "tags": ["手机", "二手交易", "影像旗舰", "Xiaomi 14 Ultra", "X100 Pro", "Find X7 Ultra", "Galaxy S24 Ultra", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-k-series-heavy-use-001",
+    "category": "手机",
+    "title": "性能取向机型的二手风险常常来自重度游戏使用而不是单次维修",
+    "content": "Redmi K70、iQOO 12、realme GT 系列这类性能机，二手风险往往不是简单的摔修，而是长期边充边玩、高温环境和高频满载使用导致的电池衰减、接口磨损和热稳定性下降。知识库里应把这类经验固定为一条“重度使用痕迹优先级高于表面成色”的规则。",
+    "tags": ["手机", "二手交易", "Redmi K70", "iQOO 12", "realme GT", "重度使用", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-huawei-high-end-benefits-001",
+    "category": "手机",
+    "title": "二手高端华为手机值得额外确认剩余权益而不是只看保修日期",
+    "content": "对 Mate 60、Pura 70 这类高端华为手机来说，二手交易里有价值的不只是保修是否还在，还包括是否还带特定延保、贴膜、清洁保养或上门服务等权益。知识库里把这条写进去后，模型在回答“值不值得买二手高端华为”时会更像真实导购而不是只会看价格。",
+    "tags": ["手机", "二手交易", "Huawei", "Mate 60", "Pura 70", "权益", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-s24-ultra-spen-check-001",
+    "category": "手机",
+    "title": "二手 Galaxy Ultra 要额外确认 S Pen 和镜头边框状态",
+    "content": "对 Galaxy S23 Ultra、S24 Ultra 这类机型，验机时除了常规屏幕和电池，还应检查 S Pen 是否正常配对、压感与收纳是否顺畅，以及镜头边框是否有明显磕碰。因为这类细节往往直接反映前任用户的使用强度和跌落史。",
+    "tags": ["手机", "二手交易", "Samsung", "Galaxy S23 Ultra", "Galaxy S24 Ultra", "S Pen", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-iphone-pro-camera-lens-001",
+    "category": "手机",
+    "title": "二手 iPhone Pro 机型要重点看长焦和防抖状态",
+    "content": "对 iPhone 13 Pro、14 Pro、15 Pro、16 Pro 这类机型来说，长焦镜头、视频防抖和夜景表现往往比日间主摄更能暴露镜组状态。知识库里适合把这条验机经验固化下来，避免模型只建议看屏幕和电池。",
+    "tags": ["手机", "二手交易", "Apple", "iPhone 13 Pro", "iPhone 15 Pro", "长焦", "验机", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-midrange-curved-screen-risk-001",
+    "category": "手机",
+    "title": "中高端曲面屏手机二手交易时要特别看边缘触控和漏液",
+    "content": "对一些曲面屏或四曲屏机型，二手交易的隐性风险常常不是正面大裂，而是边缘细小漏液、绿线、误触和贴膜长期起边。知识库里把这条写进二手交易库后，在面对线下验机问题时会更像真实买家经验。",
+    "tags": ["手机", "二手交易", "曲面屏", "Find X7", "X100", "Android", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-used-synth-budget-android-battery-replacement-001",
+    "category": "手机",
+    "title": "低价二手安卓机很多时候是“机器便宜，换电和修机不便宜”",
+    "content": "对入门和中端安卓机来说，二手价格低并不一定意味着总持有成本低，因为电池、屏幕、充电接口和外壳件的更换价值可能很快逼近整机成交价。知识库里适合把这条经验沉淀下来，帮助模型提醒用户不要被便宜价格单独吸引。",
+    "tags": ["手机", "二手交易", "安卓", "预算机", "换电", "维修成本", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  }
+]
