@@ -1,0 +1,130 @@
+[
+  {
+    "chunk_id": "phone-compat-iphone-dual-sim-unlocked-001",
+    "category": "手机",
+    "title": "双卡 iPhone 不等于一定能随便混插运营商卡",
+    "content": "支持双卡的 iPhone 在同时使用两个不同运营商时，设备本身通常需要是解锁版。如果用户买的是运营商锁定机，哪怕硬件支持双卡，也可能无法按预期同时使用两个不同运营商号码。这个坑点特别适合导购和二手验机场景。",
+    "tags": ["手机", "兼容性坑点", "Apple", "iPhone", "双卡", "解锁版", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-compat-samsung-esim-region-001",
+    "category": "手机",
+    "title": "三星 Galaxy 支持 eSIM 不代表本地运营商一定能开通",
+    "content": "部分 Galaxy 机型支持 eSIM，但实际开通仍取决于所在国家或地区、运营商能力以及销售地区版本。知识库里应把这条写成稳定兼容性提醒：机型支持、地区开放和运营商支持必须同时满足，缺一不可。",
+    "tags": ["手机", "兼容性坑点", "Samsung", "Galaxy", "eSIM", "地区版", "高可信"],
+    "source": "samsung_support"
+  },
+  {
+    "chunk_id": "phone-compat-oppo-reno13-dual-card-001",
+    "category": "手机",
+    "title": "Reno13 的 NFC-SIM 与双电信卡有使用前提",
+    "content": "OPPO Reno13 的 NFC-SIM 仅支持放在 SIM1 卡槽。双电信卡场景下，副卡通常还需要开通 VoLTE 并且运营商网络支持，否则用户会遇到两张电信卡不能同时按预期工作的情况。这类坑点看起来像小字说明，但对日常体验影响非常直接。",
+    "tags": ["手机", "兼容性坑点", "OPPO", "Reno13", "NFC-SIM", "双电信", "VoLTE", "高可信"],
+    "source": "oppo_specs"
+  },
+  {
+    "chunk_id": "phone-compat-vivo-x200-wireless-charge-001",
+    "category": "手机",
+    "title": "X200 Pro 系列无线充对线圈位置和配件更敏感",
+    "content": "vivo X200 Pro 和 X200 Pro mini 使用无线充电时，更建议配合自家兼容底座。第三方无线充、车载无线充以及带金属件或较厚磁吸结构的保护壳，可能因为线圈未对齐、热量累积或异物干扰，出现无法充电、发热明显或充电效率异常下降的问题。",
+    "tags": ["手机", "兼容性坑点", "vivo", "X200 Pro", "无线充电", "保护壳", "高可信"],
+    "source": "vivo_support"
+  },
+  {
+    "chunk_id": "phone-compat-huawei-access-card-001",
+    "category": "手机",
+    "title": "华为门禁卡模拟并不是所有卡都能直接录入",
+    "content": "华为钱包的门禁卡功能存在机型、钱包版本和卡片类型限制，空白卡不支持直接添加。导购时如果用户的核心需求是手机门禁，一定要提醒其确认支持机型、钱包版本以及门禁系统类型，避免买回去才发现自家门禁无法迁入。",
+    "tags": ["手机", "兼容性坑点", "Huawei", "Mate 60", "Pura 70", "nova 12", "门禁卡", "高可信"],
+    "source": "huawei_support"
+  },
+  {
+    "chunk_id": "phone-compat-redmi-note14pro-wet-charge-001",
+    "category": "手机",
+    "title": "有 IP68 不代表手机潮湿时可以放心插线充电",
+    "content": "Redmi Note 14 Pro 虽然具备较高等级的防水防尘能力，但官方依然明确提醒在潮湿状态下不要充电。很多用户会把 IP68 误解成“进水也没事”，实际使用中充电口残留液体、冷凝水或潮湿环境仍可能导致听筒、麦克风、扬声器或充电行为异常。",
+    "tags": ["手机", "兼容性坑点", "Xiaomi", "Redmi Note 14 Pro", "IP68", "充电", "高可信"],
+    "source": "xiaomi_specs"
+  },
+  {
+    "chunk_id": "phone-compat-synth-dual-standby-not-dual-active-001",
+    "category": "手机",
+    "title": "双卡双待手机不等于双卡都能同时完整占线工作",
+    "content": "在很多常见手机上，双卡双待更接近“待机时都在线”，而不是两张卡在所有运营商组合、通话状态和数据场景下都能完整并行工作。对 Galaxy S23/S24、部分 OPPO、vivo 和小米双卡机型来说，用户最容易踩的坑就是把双待误解成双通，结果在副卡来电、数据切换或漫游时发现行为和预期不一致。",
+    "tags": ["手机", "兼容性坑点", "双卡", "Galaxy S23", "Galaxy S24", "Xiaomi 14", "OPPO", "vivo", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-typec-video-out-001",
+    "category": "手机",
+    "title": "Type-C 手机不等于都适合稳定外接显示器或扩展坞",
+    "content": "即便接口都叫 Type-C，不同手机在有线投屏、桌面模式、外接显示稳定性和扩展坞兼容性上差异仍然很大。知识库里适合沉淀一条稳定提醒：像 iPhone 15/16、Galaxy S23/S24、Mate 60、小米 14 这类常见机型，只能逐个看视频输出和系统交互能力，不能因为接口形态相同就默认外接体验一致。",
+    "tags": ["手机", "兼容性坑点", "Type-C", "iPhone 15", "Galaxy S24", "Mate 60", "Xiaomi 14", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-magsafe-case-001",
+    "category": "手机",
+    "title": "MagSafe 配件吸得上去不代表充电和散热体验都正常",
+    "content": "围绕 iPhone 12 到 iPhone 16 的 MagSafe 生态，用户最常踩的坑不是“能不能吸住”，而是第三方磁吸壳、支架和车载配件会改变线圈位置、散热路径或实际充电功率。知识库里适合把这类兼容性问题写清楚：磁吸成功只是第一步，真正的体验还要看发热、速度、稳定性和配件做工。",
+    "tags": ["手机", "兼容性坑点", "Apple", "iPhone 12", "iPhone 15", "iPhone 16", "MagSafe", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-android-wireless-car-001",
+    "category": "手机",
+    "title": "安卓旗舰放进车载无线充电位不一定都能稳定快充",
+    "content": "像 Galaxy S24 Ultra、小米 14 Ultra、vivo X100 Pro、OPPO Find X7 Ultra 这类影像旗舰，摄像头模组普遍更大更厚，放进车载无线充时更容易出现线圈偏移、支架顶住镜头、充电断续或发热偏高的问题。知识库里这条很适合作为高复用兼容性提醒。",
+    "tags": ["手机", "兼容性坑点", "Samsung", "Xiaomi", "vivo", "OPPO", "车载无线充", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-foldable-film-case-001",
+    "category": "手机",
+    "title": "折叠屏贴膜和保护壳不能只按普通直板机思路买",
+    "content": "Galaxy Z Fold、Z Flip、Find N 和 X Fold 这类折叠屏，在贴膜、保护壳和磁吸配件选择上都比普通直板机更敏感。过厚的壳、边框公差不稳的膜和中轴干涉件，都可能影响开合、卡灰、顶膜甚至加速保护膜起边。知识库里应把它写成明确坑点，而不是泛泛说“最好买原厂配件”。",
+    "tags": ["手机", "兼容性坑点", "折叠屏", "Galaxy Z Fold", "Find N", "X Fold", "配件", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-esim-travel-001",
+    "category": "手机",
+    "title": "常出国用户选 eSIM 手机时要同时考虑主卡保号和境外流量方案",
+    "content": "很多用户觉得支持 eSIM 的手机天然更适合旅行，但实际体验还取决于本地主号是否支持保号、境外套餐提供商质量、回国后配置是否容易恢复，以及设备是否支持自己想用的双卡组合。对 iPhone 14/15/16、Galaxy S24 和部分海外版折叠屏来说，这条经验特别高频。",
+    "tags": ["手机", "兼容性坑点", "eSIM", "iPhone 15", "Galaxy S24", "出境", "双卡", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-iphone15-ssd-power-001",
+    "category": "手机",
+    "title": "iPhone 15 Pro 直连外置存储不只看接口，还要看供电和格式",
+    "content": "很多用户看到 iPhone 15 Pro 支持更强的有线扩展后，会默认认为任何外置 SSD、读卡器都能稳定即插即用。实际使用里，供电、线材质量、文件系统格式和设备发热都会影响结果。知识库里适合把它写成兼容性提醒，而不是一句“支持外录”就带过。",
+    "tags": ["手机", "兼容性坑点", "Apple", "iPhone 15 Pro", "iPhone 16 Pro", "外置存储", "Type-C", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-galaxy-dex-display-001",
+    "category": "手机",
+    "title": "支持桌面模式的 Galaxy 也要注意显示器和扩展坞兼容性",
+    "content": "Galaxy S23、S24 和部分 Fold 机型即使支持桌面模式，实际连接显示器、投影仪或扩展坞时，仍可能在分辨率、供电、鼠标键盘识别和长时间稳定性上出现差异。知识库里沉淀这类坑点很有价值，因为用户往往高估了“能连上”和“能稳定办公”之间的差距。",
+    "tags": ["手机", "兼容性坑点", "Samsung", "Galaxy S23", "Galaxy S24", "DeX", "扩展坞", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-android-camera-rig-001",
+    "category": "手机",
+    "title": "大镜头安卓旗舰在云台和拍摄夹具上更容易碰到物理兼容问题",
+    "content": "小米 14 Ultra、Find X7 Ultra、X100 Pro 这类大模组影像旗舰，接云台、散热背夹和视频拍摄夹具时更容易出现镜头顶住、重心偏移、按钮误触和配重不稳的问题。知识库里应该把这类兼容性问题提前说清，而不是只讨论画质。",
+    "tags": ["手机", "兼容性坑点", "Xiaomi 14 Ultra", "Find X7 Ultra", "X100 Pro", "云台", "拍摄配件", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-compat-synth-wireless-mic-latency-001",
+    "category": "手机",
+    "title": "手机能连接无线麦克风不代表直播和收音体验就一定稳定",
+    "content": "像 iPhone 15、Galaxy S24、小米 14、Find X7 这类热门手机，接无线麦克风、直播声卡和 Type-C 音频配件时，最容易踩的坑不是识别失败，而是延迟、供电、录制 App 权限和多设备同时接入后的稳定性问题。知识库里适合固定这条经验，方便后面回答内容创作和直播场景问题。",
+    "tags": ["手机", "兼容性坑点", "无线麦克风", "iPhone 15", "Galaxy S24", "Xiaomi 14", "Find X7", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  }
+]

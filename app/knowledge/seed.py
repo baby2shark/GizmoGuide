@@ -1,4 +1,4 @@
-"""Seed the knowledge base from mock data on first startup."""
+"""Seed the knowledge base from local JSON data on first startup."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ from app.knowledge.store import KnowledgeStore
 
 logger = logging.getLogger(__name__)
 
-MOCK_DATA_PATH = Path(__file__).parent / "data" / "mock_knowledge.json"
+DATA_DIR = Path(__file__).parent / "data"
 
 
 def tokenize_chinese(text: str) -> str:
@@ -22,17 +22,27 @@ def tokenize_chinese(text: str) -> str:
     return " ".join(t.strip() for t in tokens if t.strip())
 
 
-def load_mock_knowledge() -> list[dict]:
-    """Load mock knowledge data from JSON file."""
-    if not MOCK_DATA_PATH.exists():
-        logger.warning("Mock knowledge data not found at %s", MOCK_DATA_PATH)
+def load_seed_knowledge() -> list[dict]:
+    """Load seed knowledge from all JSON files in the data directory."""
+    if not DATA_DIR.exists():
+        logger.warning("Knowledge data directory not found at %s", DATA_DIR)
         return []
-    with open(MOCK_DATA_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+
+    documents: list[dict] = []
+    for file_path in sorted(DATA_DIR.glob("*.json")):
+        with open(file_path, "r", encoding="utf-8") as f:
+            file_documents = json.load(f)
+        if not isinstance(file_documents, list):
+            logger.warning("Skipping non-list knowledge file: %s", file_path)
+            continue
+        documents.extend(file_documents)
+        logger.info("Loaded %d knowledge chunks from %s", len(file_documents), file_path.name)
+
+    return documents
 
 
 def seed_knowledge(store: KnowledgeStore, embedder: EmbeddingClient) -> int:
-    """Seed the knowledge base with mock data if it's empty.
+    """Seed the knowledge base with local JSON data if it's empty.
 
     Returns the number of chunks seeded.
     """
@@ -41,19 +51,19 @@ def seed_knowledge(store: KnowledgeStore, embedder: EmbeddingClient) -> int:
         logger.info("Knowledge base already has %d chunks, skipping seed", existing_count)
         return 0
 
-    mock_data = load_mock_knowledge()
-    if not mock_data:
-        logger.warning("No mock knowledge data to seed")
+    seed_data = load_seed_knowledge()
+    if not seed_data:
+        logger.warning("No knowledge data to seed")
         return 0
 
-    logger.info("Seeding %d knowledge chunks...", len(mock_data))
+    logger.info("Seeding %d knowledge chunks...", len(seed_data))
 
     # Generate embeddings in batches
     batch_size = 5
     chunks: list[KnowledgeChunk] = []
 
-    for i in range(0, len(mock_data), batch_size):
-        batch = mock_data[i : i + batch_size]
+    for i in range(0, len(seed_data), batch_size):
+        batch = seed_data[i : i + batch_size]
         texts = [f"{item['title']}\n{item['content']}" for item in batch]
 
         try:

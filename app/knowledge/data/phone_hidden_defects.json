@@ -1,0 +1,146 @@
+[
+  {
+    "chunk_id": "phone-hidden-iphone11-battery-recalibration-001",
+    "category": "手机",
+    "title": "iPhone 11 系列曾出现电池健康估算不准的隐藏风险",
+    "content": "iPhone 11、iPhone 11 Pro 和 iPhone 11 Pro Max 在部分系统版本中曾出现电池健康度估算不准确的问题，Apple 为此提供过重新校准方案。它很适合写入隐形缺陷库，因为用户看到的并不是一个直接坏掉的部件，而是“健康度显示”和实际体验可能暂时不一致。",
+    "tags": ["手机", "隐形缺陷", "Apple", "iPhone 11", "电池健康", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-hidden-iphone-unverified-parts-001",
+    "category": "手机",
+    "title": "iPhone 非正常维修后的未验证部件会带来隐性功能风险",
+    "content": "部分 iPhone 在更换显示、摄像头、电池等部件后，如果未完成正确校准或使用了未验证部件，可能影响 Apple Pay、Face ID、显示表现或系统提示状态。这类问题在二手机里尤其隐蔽，因为外观可能看不出异常，但系统层面的稳定性和功能完整性已经发生变化。",
+    "tags": ["手机", "隐形缺陷", "Apple", "iPhone 12", "iPhone 15", "未验证部件", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-hidden-galaxy-water-drop-humidity-001",
+    "category": "手机",
+    "title": "三星水滴图标不一定代表真正进水，也可能是高湿环境误触发",
+    "content": "部分 Galaxy 机型出现无法充电和水滴图标时，不一定意味着主板或接口已经严重进液，官方同时给出高湿环境、冷凝和接口潮湿导致误触发的解释。知识库里固定这条很重要，因为它能纠正用户和导购把“水滴提示”直接等同于“硬件大故障”的误判。",
+    "tags": ["手机", "隐形缺陷", "Samsung", "Galaxy", "水滴图标", "湿度", "高可信"],
+    "source": "samsung_support"
+  },
+  {
+    "chunk_id": "phone-hidden-galaxy-z-screen-protector-001",
+    "category": "手机",
+    "title": "折叠屏内屏保护膜老化本身就是高频维护点",
+    "content": "Galaxy Z 系列内屏保护膜起翘、气泡或老化不是一个适合粗暴归类为质量缺陷的问题，更准确的说法是高频维护点。知识库里应把这条写成稳定经验：折叠屏用户需要把内屏保护膜视作耗材式维护项，不建议自行撕除，最好走官方服务。",
+    "tags": ["手机", "隐形缺陷", "Samsung", "Galaxy Z", "折叠屏", "保护膜", "中高可信"],
+    "source": "samsung_support"
+  },
+  {
+    "chunk_id": "phone-hidden-xiaomi11-board-heat-001",
+    "category": "手机",
+    "title": "小米 11 系列长期高热后主板稳定性风险需要重点留意",
+    "content": "基于维修圈和用户反馈的私域经验，小米 11 系列在长期高热、高负载和频繁快充环境下，更容易出现主板层面的稳定性问题，包括重启、不开机、发热异常和焊点相关故障。这条适合作为待验证的隐形缺陷知识卡，导购和二手场景可用来提醒用户重点关注维修史和长期高热痕迹。",
+    "tags": ["手机", "隐形缺陷", "Xiaomi", "小米 11", "主板", "高热", "待验证", "低可信"],
+    "source": "mock_private_repair_experience"
+  },
+  {
+    "chunk_id": "phone-hidden-vivox100-board-risk-001",
+    "category": "手机",
+    "title": "vivo X100 的死机重启类案例可作为低权重风险线索",
+    "content": "基于投诉和零散维修案例，vivo X100 在个别样本中出现过死机、重启和主板异常线索，但公开证据仍不足以支撑“系列性通病”的强结论。这类内容更适合作为低权重监控知识：可以提醒排查，不应直接当作确定性缺陷下结论。",
+    "tags": ["手机", "隐形缺陷", "vivo", "X100", "重启", "主板", "待验证", "低可信"],
+    "source": "mock_complaint_watchlist"
+  },
+  {
+    "chunk_id": "phone-hidden-oppo-findx-mainboard-001",
+    "category": "手机",
+    "title": "部分 OPPO Find 机型的黑屏重启和主板维修线索需要持续观察",
+    "content": "围绕 OPPO Find X3、Find X6 等机型，投诉和维修反馈中曾出现黑屏、重启和主板维修相关线索，但缺乏统一的官方确认口径。知识库中可先将其作为待验证风险项存放，供后续结合更多维修单据、批次信息和售后口径继续补强。",
+    "tags": ["手机", "隐形缺陷", "OPPO", "Find X3", "Find X6", "黑屏", "主板", "待验证", "低可信"],
+    "source": "mock_complaint_watchlist"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-foldable-crease-maintenance-001",
+    "category": "手机",
+    "title": "折叠屏中轴折痕的真实感知往往比宣传图更强",
+    "content": "在 Galaxy Z Fold、Z Flip、Find N、X Fold 这类折叠屏上，很多用户实际长期使用后会比首发上手时更在意中轴折痕、触感变化和反光表现。知识库里适合把这条写成稳定维护认知，而不是简单说成缺陷，因为它更像折叠形态的长期体验成本。",
+    "tags": ["手机", "隐形缺陷", "折叠屏", "Galaxy Z Fold", "Find N", "X Fold", "折痕", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-camera-flagship-weight-drop-001",
+    "category": "手机",
+    "title": "大模组影像旗舰更容易在轻微跌落后出现镜头侧隐性问题",
+    "content": "像小米 14 Ultra、vivo X100 Pro、Find X7 Ultra、Galaxy S24 Ultra 这类大镜头手机，轻微跌落后最容易被忽视的是镜组偏移、对焦异常、镜头异响和视频防抖表现下降，而不一定是明显碎裂。知识库里把这条写进去，对影像旗舰导购和二手验机都很有帮助。",
+    "tags": ["手机", "隐形缺陷", "影像旗舰", "Xiaomi 14 Ultra", "X100 Pro", "Find X7 Ultra", "Galaxy S24 Ultra", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-performance-phone-battery-stress-001",
+    "category": "手机",
+    "title": "性能取向手机的隐性风险常是长期高热对电池和接口的累积压力",
+    "content": "Redmi K70、iQOO 12、realme GT 这类性能取向机型，在长期边充边玩和高负载场景下，更容易出现电池衰减偏快、接口松动、机身局部热老化和胶水老化等隐性问题。它未必会立刻坏，但会逐步拉低长期使用体验。",
+    "tags": ["手机", "隐形缺陷", "Redmi K70", "iQOO 12", "realme GT", "电池", "接口", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-old-iphone-faceid-risk-001",
+    "category": "手机",
+    "title": "老款 iPhone 的高价值风险常来自维修后的人脸识别和支付链路",
+    "content": "对 iPhone 12、13、14 这些流通量大的二手机来说，真正昂贵的隐性风险往往不是普通电池老化，而是维修后 Face ID、前摄、屏幕和支付链路出现不完全兼容。外观正常并不等于整机状态健康，这类风险在非官方维修机器上尤其需要警惕。",
+    "tags": ["手机", "隐形缺陷", "Apple", "iPhone 12", "iPhone 13", "iPhone 14", "Face ID", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-android-curved-screen-drop-001",
+    "category": "手机",
+    "title": "曲面屏或四曲屏机型轻摔后更容易留下边角显示隐患",
+    "content": "在一些曲面屏或四曲屏安卓旗舰上，边角轻摔后即使没有立即大面积碎裂，也更容易出现边缘绿线、局部触控异常、细小漏液或贴膜持续起边这类后续问题。知识库里这条适合写成隐性风险提醒，服务于购机解释和二手筛选。",
+    "tags": ["手机", "隐形缺陷", "Android", "曲面屏", "Find X7", "X100 Pro", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-xiaomi11-ultra-watchlist-001",
+    "category": "手机",
+    "title": "小米 11 和 11 Ultra 仍应作为高热线索机型单独观察",
+    "content": "基于维修和玩家圈经验，小米 11、11 Pro、11 Ultra 在二手流通中仍然值得被放进单独观察名单，重点关注主板维修史、异常发热、重启记录和长期高负载痕迹。这类内容更适合作为待验证高风险线索，而不是强规则事实。",
+    "tags": ["手机", "隐形缺陷", "Xiaomi", "小米 11", "小米 11 Ultra", "待验证", "高热", "低可信"],
+    "source": "mock_private_repair_experience"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-foldable-hinge-wear-001",
+    "category": "手机",
+    "title": "折叠屏长期使用后的隐性风险常常先出现在铰链手感变化上",
+    "content": "对 Galaxy Z Fold、Z Flip、Find N 和 X Fold 这类设备来说，很多长期使用问题并不是第一时间表现为坏掉，而是先体现在铰链阻尼变化、展开不再那么平整、异响或中轴区域细微手感变化。知识库里把这条写成隐形风险很有价值。",
+    "tags": ["手机", "隐形缺陷", "折叠屏", "Galaxy Z Fold", "Find N", "X Fold", "铰链", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-old-android-port-wear-001",
+    "category": "手机",
+    "title": "老安卓机的充电口松动往往是长期使用后的高频隐性问题",
+    "content": "对高频插拔的安卓手机来说，充电口松动、接触不稳定和数据线角度挑剔是很常见的老化问题，尤其出现在被长期当主力机使用的中端和性能机上。它不一定会被卖家主动提及，但会持续影响体验。",
+    "tags": ["手机", "隐形缺陷", "Android", "充电口", "老化", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-thin-phone-battery-aging-001",
+    "category": "手机",
+    "title": "轻薄导向手机的长期风险常体现在电池衰减后的体验落差更大",
+    "content": "一些更强调轻薄和手感的手机，在新机阶段体验很好，但一旦电池开始衰减，续航落差会比大电池机型更明显。知识库里适合把这条写成稳定经验，尤其用于回答轻薄机是否适合长期持有的问题。",
+    "tags": ["手机", "隐形缺陷", "轻薄机", "电池衰减", "长期持有", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-camera-lens-coating-wear-001",
+    "category": "手机",
+    "title": "高频裸机使用的影像旗舰更容易出现镜头圈和镜片外层磨损",
+    "content": "对大镜头手机来说，长期裸机使用后最容易被忽视的不是一眼可见的大裂，而是镜头圈磕碰、镜片外层细划痕和镀膜磨损，这些问题会在逆光、夜景和强光鬼影场景下慢慢体现出来。知识库里这条既能服务导购，也能服务二手验机。",
+    "tags": ["手机", "隐形缺陷", "影像旗舰", "镜头", "镀膜", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-hidden-synth-vivo-x90-watchlist-001",
+    "category": "手机",
+    "title": "vivo X90 系列在二手流通中也值得保留主板稳定性观察标签",
+    "content": "基于玩家圈和零散维修口碑，vivo X90 系列在二手流通中也适合保留主板稳定性和异常重启的观察标签，尤其针对长期高热和重度拍摄使用样本。这类内容目前更适合作为待验证线索，而不是硬性结论。",
+    "tags": ["手机", "隐形缺陷", "vivo", "X90", "主板", "待验证", "低可信"],
+    "source": "mock_private_repair_experience"
+  }
+]

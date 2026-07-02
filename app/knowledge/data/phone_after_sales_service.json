@@ -1,0 +1,130 @@
+[
+  {
+    "chunk_id": "phone-after-sales-apple-express-replacement-001",
+    "category": "手机",
+    "title": "AppleCare 的价值之一是快速换机而不是只延长保修",
+    "content": "Apple 为部分符合条件的 iPhone 提供 Express Replacement 服务，核心价值是缩短停机时间，而不是等原机修好再继续使用。对于重度依赖手机办公、出差或长期离不开主力机的用户，这类服务体验差异往往比单纯的维修价格更重要。",
+    "tags": ["手机", "售后与服务", "Apple", "iPhone", "AppleCare", "快速换机", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-apple-battery-service-001",
+    "category": "手机",
+    "title": "iPhone 官方电池服务的意义在于质量与后续保固更稳定",
+    "content": "Apple 官方电池服务除了更换电池本身，还会带来更明确的服务保证和更稳定的后续支持。知识库里适合沉淀这样一条经验：对高价 iPhone 来说，官方换电虽然价格未必最低，但在配件质量、系统兼容和后续保修衔接上通常更稳。",
+    "tags": ["手机", "售后与服务", "Apple", "iPhone", "电池服务", "高可信"],
+    "source": "apple_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-huawei-mate60-benefits-001",
+    "category": "手机",
+    "title": "Mate 60 系列服务权益比普通机型更适合当导购卖点",
+    "content": "Mate 60 系列除了基础保修，还包含上门取机、免费清洁保养、保修期内贴膜权益、维修期间备用机等服务卖点。对于高端机用户来说，售后便利性和停机成本比单纯参数更容易影响购买决策，因此这类权益值得沉淀进知识库。",
+    "tags": ["手机", "售后与服务", "Huawei", "Mate 60", "高端服务", "高可信"],
+    "source": "huawei_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-oppo-reno13-policy-001",
+    "category": "手机",
+    "title": "OPPO Reno13 的三包政策适合直接写成稳定售后知识",
+    "content": "Reno13 等主流 OPPO 手机可按官方三包政策理解为 7 日退货、30 日换货、质保期内免费保修。知识库沉淀这类条目时，可以把它用作渠道对比和购买建议的基础口径，帮助用户快速判断官渠和非官渠的售后差异。",
+    "tags": ["手机", "售后与服务", "OPPO", "Reno13", "三包", "高可信"],
+    "source": "oppo_specs"
+  },
+  {
+    "chunk_id": "phone-after-sales-vivo-repair-service-001",
+    "category": "手机",
+    "title": "vivo 的寄修、预约到店和同城快修值得写入服务经验库",
+    "content": "vivo 官方服务覆盖寄修、预约到店、同城快修和维修价格查询等能力。对于用户来说，维修链路是否透明、能否快速交付、是否能提前查询价格，都会直接影响对品牌售后体验的判断，这也是导购时很容易被忽视但很有用的信息。",
+    "tags": ["手机", "售后与服务", "vivo", "X200", "寄修", "同城快修", "高可信"],
+    "source": "vivo_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-xiaomi-service-policy-001",
+    "category": "手机",
+    "title": "小米和 Redmi 机型的售后优势之一是网点和标准政策清晰",
+    "content": "小米官方提供 7 天无理由退货、15 天换货、较广覆盖的售后网点以及保外维修价格查询。对 Redmi K 系列和 Note 系列这种高流通机型来说，售后透明度和网点密度会直接影响用户对风险和维修成本的预期。",
+    "tags": ["手机", "售后与服务", "Xiaomi", "Redmi", "K80", "Note 14 Pro", "高可信"],
+    "source": "xiaomi_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-samsung-repair-service-001",
+    "category": "手机",
+    "title": "三星官方维修的核心卖点是原厂零件和维修后保障",
+    "content": "三星官方维修服务强调认证技术人员、原厂零件以及维修后的有限保障。知识库里可以把这类经验写得更实用一些：对折叠屏、旗舰机和涉及屏幕总成更换的机型，官方维修体系的价值往往高于单次第三方便宜报价。",
+    "tags": ["手机", "售后与服务", "Samsung", "Galaxy", "原厂零件", "维修保障", "高可信"],
+    "source": "samsung_support"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-foldable-official-priority-001",
+    "category": "手机",
+    "title": "折叠屏手机的售后优先级通常应高于普通直板机",
+    "content": "对 Galaxy Z Fold、Z Flip、OPPO Find N、vivo X Fold 这类折叠屏来说，售后体系的价值通常高于普通直板机，因为铰链、内屏、保护膜和开合结构都更依赖品牌侧维修能力。知识库里适合沉淀这条经验：买折叠屏不能只看硬件参数，售后覆盖和官方维修可得性本身就是核心配置之一。",
+    "tags": ["手机", "售后与服务", "折叠屏", "Galaxy Z Fold", "Find N", "X Fold", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-iphone-care-plus-value-001",
+    "category": "手机",
+    "title": "高客单 iPhone 用户是否要买 AppleCare 更像停机风险管理问题",
+    "content": "对 iPhone 15 Pro、16 Pro 这类高客单机型用户来说，AppleCare 的价值并不只在“省一次维修钱”，而在于意外损坏、快速换机和维修链路的确定性。知识库里把这条写清楚后，模型在回答延保是否值得买时就不会只会机械比较价格。",
+    "tags": ["手机", "售后与服务", "Apple", "iPhone 15 Pro", "iPhone 16 Pro", "AppleCare", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-xiaomi-price-transparency-001",
+    "category": "手机",
+    "title": "小米和 Redmi 的售后透明度优势常体现在保外维修预期更清晰",
+    "content": "对小米 14、Redmi K70、Note 系列这类高流通机型来说，用户往往不是绝对追求最低维修价，而是更在意保外维修有没有明确价格区间、配件是否常见、网点是否好找。知识库里把这类服务经验写进去，对比同价位机型时会很有帮助。",
+    "tags": ["手机", "售后与服务", "Xiaomi", "Redmi", "小米 14", "K70", "维修透明", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-huawei-premium-user-001",
+    "category": "手机",
+    "title": "高端华为用户对售后感知往往来自服务体验而不只是保修本身",
+    "content": "对 Mate 60 和 Pura 70 这类高端华为机型，用户对品牌售后的感知常来自服务响应速度、备机、到店体验、清洁保养和权益延续，而不只是有没有一年保修。知识库里沉淀这条经验后，模型在比较高端机时会更像真实销售而不是参数比较器。",
+    "tags": ["手机", "售后与服务", "Huawei", "Mate 60", "Pura 70", "服务体验", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-oppo-vivo-offline-network-001",
+    "category": "手机",
+    "title": "OPPO 和 vivo 的线下服务便利性对父母机和长期主力机尤其重要",
+    "content": "在很多真实购买场景里，OPPO 和 vivo 的线下服务便利性对父母机、备用机较少的用户、以及更依赖到店沟通的人群特别关键。知识库里适合固定这类服务经验：对不爱折腾、希望快速处理问题的用户，线下可达性本身就是购买理由。",
+    "tags": ["手机", "售后与服务", "OPPO", "vivo", "线下网点", "父母机", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-samsung-care-foldables-001",
+    "category": "手机",
+    "title": "折叠屏用户更需要把延保和碎屏保障当作购机预算的一部分",
+    "content": "像 Galaxy Z Fold、Z Flip 这类折叠屏，延保和碎屏保障的价值通常明显高于普通直板机，因为内屏、铰链和保护膜相关维护成本更高。知识库里适合把这条经验固定下来，方便回答折叠屏是否值得买、值不值得长期主力使用。",
+    "tags": ["手机", "售后与服务", "Samsung", "Galaxy Z Fold", "Galaxy Z Flip", "延保", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-iphone-official-repair-resale-001",
+    "category": "手机",
+    "title": "iPhone 官方维修的隐性价值还体现在后续转卖更省心",
+    "content": "对 iPhone 13、14、15、16 这类高流通机型来说，官方维修的价值不只在当下修得稳，还在后续转卖时更容易说明机器来历、减少买家对未验证部件的担忧。知识库里把这条售后经验沉淀下来，会让二手相关回答更完整。",
+    "tags": ["手机", "售后与服务", "Apple", "iPhone 13", "iPhone 15", "官方维修", "转卖", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-budget-phone-service-gap-001",
+    "category": "手机",
+    "title": "预算机的售后差异很多时候体现在修得值不值而不是修不修得了",
+    "content": "对中低端安卓机来说，售后痛点往往不是完全无法维修，而是屏幕、电池和主板的更换成本很容易接近整机残值。知识库里应该把这类服务经验写进去，帮助模型在预算机推荐时顺手提醒后续维护成本。",
+    "tags": ["手机", "售后与服务", "预算机", "Android", "维修残值", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  },
+  {
+    "chunk_id": "phone-after-sales-synth-creator-phone-downtime-001",
+    "category": "手机",
+    "title": "内容创作者和商旅用户比普通用户更应关注停机成本",
+    "content": "对经常拍视频、出差或把手机当主力生产工具的人来说，售后的核心不是谁便宜，而是谁能更快恢复可用状态。知识库里把“停机成本”写成一条独立服务经验很有必要，这会明显提升推荐解释质量。",
+    "tags": ["手机", "售后与服务", "内容创作", "商旅", "停机成本", "合成", "中高可信"],
+    "source": "mock_expert_synthesis"
+  }
+]
