@@ -93,31 +93,95 @@ async function sendChatMessage() {
   userMessage.value = "";
   autosizeTextarea();
 
-  const typingNode = appendTypingMessage();
+  const streamNode = appendStreamingMessage();
   setBusy(true);
 
   try {
-    const response = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session_id: sessionId,
-        message,
-        candidate_products: activeCandidates,
-      }),
-    });
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-    typingNode.remove();
-    appendAssistantResponse(data);
+    const payload = {
+      session_id: sessionId,
+      message,
+      candidate_products: activeCandidates,
+    };
+    const data = await sendChatMessageStream(payload, streamNode);
+    renderFinalAssistantResponse(streamNode, data);
   } catch (error) {
-    typingNode.remove();
-    appendErrorMessage(error);
+    renderStreamError(streamNode, error);
   } finally {
     setBusy(false);
   }
+}
+
+async function sendChatMessageStream(payload, streamNode) {
+  const response = await fetch("/chat/stream", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "text/event-stream",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.body) return sendChatMessageFallback(payload);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split("\n\n");
+    buffer = events.pop() || "";
+
+    for (const rawEvent of events) {
+      const parsed = parseSseEvent(rawEvent);
+      if (!parsed) continue;
+      const finalResponse = handleStreamEvent(parsed, streamNode);
+      if (finalResponse) return finalResponse;
+    }
+  }
+
+  if (buffer.trim()) {
+    const parsed = parseSseEvent(buffer);
+    const finalResponse = parsed ? handleStreamEvent(parsed, streamNode) : null;
+    if (finalResponse) return finalResponse;
+  }
+
+  throw new Error("流式连接已结束，但没有收到最终回答。");
+}
+
+async function sendChatMessageFallback(payload) {
+  const response = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+function parseSseEvent(rawEvent) {
+  const lines = rawEvent.split("\n");
+  const dataLines = [];
+  for (const line of lines) {
+    if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
+  }
+  if (!dataLines.length) return null;
+  return JSON.parse(dataLines.join("\n"));
+}
+
+function handleStreamEvent(event, streamNode) {
+  if (event.event === "final") {
+    return event.data?.response;
+  }
+  if (event.event === "error") {
+    const detail = event.data?.detail ? `：${event.data.detail}` : "";
+    throw new Error(`${event.message || "流式回答失败"}${detail}`);
+  }
+  appendStreamStep(streamNode, event);
+  return null;
 }
 
 function appendAssistantComparison(left, right) {
@@ -210,6 +274,32 @@ function appendTypingMessage() {
   return node;
 }
 
+function appendStreamingMessage() {
+  const node = document.createElement("article");
+  node.className = "message assistant";
+  node.innerHTML = `
+    <div class="avatar">G</div>
+    <div class="bubble">
+      <div class="stream-steps" aria-live="polite"></div>
+      <div class="typing stream-typing" aria-label="正在生成"><span></span><span></span><span></span></div>
+    </div>
+  `;
+  chatStream.appendChild(node);
+  scrollToLatest();
+  return node;
+}
+
+function appendStreamStep(node, event) {
+  const list = node.querySelector(".stream-steps");
+  if (!list) return;
+  const item = document.createElement("div");
+  item.className = `stream-step stream-step-${escapeCssClass(event.event)}`;
+  item.textContent = event.message || "正在处理";
+  list.appendChild(item);
+  while (list.children.length > 6) list.firstElementChild?.remove();
+  scrollToLatest();
+}
+
 function appendAssistantResponse(data) {
   const node = document.createElement("article");
   node.className = "message assistant";
@@ -221,20 +311,41 @@ function appendAssistantResponse(data) {
   scrollToLatest();
 }
 
+function renderFinalAssistantResponse(node, data) {
+  const bubble = node.querySelector(".bubble");
+  if (!bubble) return;
+  bubble.innerHTML = renderAssistantContent(data);
+  scrollToLatest();
+}
+
+function renderStreamError(node, error) {
+  const bubble = node.querySelector(".bubble");
+  if (!bubble) {
+    appendErrorMessage(error);
+    return;
+  }
+  bubble.innerHTML = renderErrorContent(error);
+  scrollToLatest();
+}
+
 function appendErrorMessage(error) {
   const node = document.createElement("article");
   node.className = "message assistant";
   node.innerHTML = `
     <div class="avatar">G</div>
-    <div class="bubble">
-      <div class="error-box">
-        <h2>需要调整一下</h2>
-        <p>${escapeHtml(error.message || "未知错误")}</p>
-      </div>
-    </div>
+    <div class="bubble">${renderErrorContent(error)}</div>
   `;
   chatStream.appendChild(node);
   scrollToLatest();
+}
+
+function renderErrorContent(error) {
+  return `
+    <div class="error-box">
+      <h2>需要调整一下</h2>
+      <p>${escapeHtml(error.message || "未知错误")}</p>
+    </div>
+  `;
 }
 
 function renderAssistantContent(data) {
@@ -281,6 +392,10 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeCssClass(value) {
+  return String(value).replace(/[^a-z0-9_-]/gi, "-");
 }
 
 autosizeTextarea();

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Callable
 from uuid import uuid4
 
 from pydantic_ai import capture_run_messages
@@ -38,32 +38,94 @@ class PurchaseDecisionAgent:
         self.memory_fork_tool = MemoryForkTool(settings)
 
     def chat(self, request: ChatRequest) -> ChatResponse:
+        return self._chat_impl(request)
+
+    def chat_with_events(
+        self,
+        request: ChatRequest,
+        emit: Callable[[str, str, dict[str, Any] | None], None],
+    ) -> ChatResponse:
+        return self._chat_impl(request, emit)
+
+    def _chat_impl(
+        self,
+        request: ChatRequest,
+        emit: Callable[[str, str, dict[str, Any] | None], None] | None = None,
+    ) -> ChatResponse:
         with trace_span(
             "purchase_agent_chat",
             input_data={"message": request.message, "session_id": request.session_id},
         ) as (span, end_span):
+            self._emit(emit, "status", "正在理解你的需求", {"session_id": request.session_id})
             user_id = request.user_id or request.session_id
             memory = long_term_memory_store.get(user_id)
             state = session_store.get(request.session_id)
             state.user_id = user_id
+            self._emit(emit, "memory", "已读取长期记忆和当前会话状态", {"user_id": user_id})
             state.profile = merge_profiles(memory.profile_memory, state.profile)
             state.profile = merge_profiles(state.profile, request.profile)
-            self._update_candidates(state, request.candidate_products)
+            if request.candidate_products:
+                self._emit(
+                    emit,
+                    "tool_start",
+                    "正在加载候选商品",
+                    {"tool": "product_lookup", "candidate_count": len(request.candidate_products)},
+                )
+            found_count, missing = self._update_candidates(state, request.candidate_products)
+            if request.candidate_products:
+                self._emit(
+                    emit,
+                    "tool_result",
+                    "候选商品加载完成",
+                    {"tool": "product_lookup", "found": found_count, "missing": missing},
+                )
+            self._emit(emit, "memory", "正在更新本轮可沉淀的长期偏好", {"user_id": user_id})
             memory = self.memory_fork_tool.extract(request.message, memory, state.profile)
             state.profile = merge_profiles(state.profile, memory.profile_memory)
             long_term_memory_store.save(memory)
+            self._emit(emit, "memory", "长期记忆已更新", {"user_id": user_id})
             state.messages.append({"role": "user", "content": request.message})
 
+            self._emit(emit, "scoring", "正在结合画像和候选商品做基础评分", {"candidate_count": len(state.candidate_products)})
             scoring_result = self._try_scoring(state)
+            self._emit(
+                emit,
+                "scoring",
+                "基础评分完成" if scoring_result else "当前信息不足，暂不输出评分结论",
+                {"winner": scoring_result.winner_name if scoring_result else None},
+            )
 
             if self.llm_client.enabled and (self.web_search_tool.enabled or self.knowledge_search_tool.enabled):
                 try:
+                    enabled_tools = []
+                    if self.knowledge_search_tool.enabled:
+                        enabled_tools.append("knowledge_search")
+                    if self.web_search_tool.enabled:
+                        enabled_tools.append("web_search")
+                    self._emit(
+                        emit,
+                        "tool_start",
+                        "正在让主 Agent 判断是否需要查询知识库或联网搜索",
+                        {"tools": enabled_tools},
+                    )
                     response = self._agent_loop_chat(request, state, scoring_result)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
                     session_store.save(state)
+                    self._emit(
+                        emit,
+                        "tool_result",
+                        "主 Agent 已完成工具编排和回答生成",
+                        {"answer_source": response.answer_source, "mode": response.mode},
+                    )
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source})
                     return response
                 except Exception as exc:
+                    self._emit(
+                        emit,
+                        "status",
+                        "主 Agent 工具链失败，正在切换到兜底回答",
+                        {"error_type": type(exc).__name__},
+                    )
                     fallback = self._fallback_chat(request, state, scoring_result)
                     fallback.agent_trace.append(f"agent_loop_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
@@ -73,12 +135,19 @@ class PurchaseDecisionAgent:
 
             if self.llm_client.enabled:
                 try:
+                    self._emit(emit, "status", "正在生成最终回答", {"answer_source": "llm"})
                     response = self._llm_chat(request, state, scoring_result)
                     state.messages.append({"role": "assistant", "content": response.assistant_message})
                     session_store.save(state)
                     end_span(output={"mode": response.mode, "answer_source": response.answer_source})
                     return response
                 except Exception as exc:
+                    self._emit(
+                        emit,
+                        "status",
+                        "LLM 生成失败，正在切换到规则兜底回答",
+                        {"error_type": type(exc).__name__},
+                    )
                     fallback = self._fallback_chat(request, state, scoring_result)
                     fallback.agent_trace.append(f"llm_failed:{type(exc).__name__}")
                     state.messages.append({"role": "assistant", "content": fallback.assistant_message})
@@ -86,11 +155,22 @@ class PurchaseDecisionAgent:
                     end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source, "error": str(exc)}, level="ERROR")
                     return fallback
 
+            self._emit(emit, "status", "当前未启用 LLM，正在使用本地规则兜底", {"answer_source": "fallback"})
             fallback = self._fallback_chat(request, state, scoring_result)
             state.messages.append({"role": "assistant", "content": fallback.assistant_message})
             session_store.save(state)
             end_span(output={"mode": fallback.mode, "answer_source": fallback.answer_source})
             return fallback
+
+    def _emit(
+        self,
+        emit: Callable[[str, str, dict[str, Any] | None], None] | None,
+        event: str,
+        message: str,
+        data: dict[str, Any] | None = None,
+    ) -> None:
+        if emit is not None:
+            emit(event, message, data)
 
     def handle(self, request: RecommendationRequest) -> RecommendationResponse:
         chat_response = self.chat(
@@ -113,14 +193,15 @@ class PurchaseDecisionAgent:
             agent_trace=chat_response.agent_trace,
         )
 
-    def _update_candidates(self, state: ConversationState, candidate_products: list[str]) -> None:
+    def _update_candidates(self, state: ConversationState, candidate_products: list[str]) -> tuple[int, list[str]]:
         if not candidate_products:
-            return
+            return 0, []
         with trace_span("product_lookup", input_data={"candidates": candidate_products}) as (span, end_span):
             products, missing = self.product_tool.get_products(candidate_products)
             if products:
                 state.candidate_products = products
             end_span(output={"found": len(products), "missing": missing})
+            return len(products), missing
 
     def _try_scoring(self, state: ConversationState) -> RecommendationResult | None:
         if len(state.candidate_products) < 2:

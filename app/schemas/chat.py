@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -29,3 +29,17 @@ class ChatResponse(BaseModel):
     recommendation: RecommendationResult | None = None
     answer_source: str = "fallback"
     agent_trace: list[str] = Field(default_factory=list)
+
+
+class ChatStreamEvent(BaseModel):
+    event: Literal[
+        "status",
+        "memory",
+        "tool_start",
+        "tool_result",
+        "scoring",
+        "final",
+        "error",
+    ]
+    message: str
+    data: dict[str, Any] = Field(default_factory=dict)
