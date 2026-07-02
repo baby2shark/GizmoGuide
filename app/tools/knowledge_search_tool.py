@@ -82,18 +82,21 @@ class KnowledgeSearchTool:
                 return result
 
             try:
-                chunks = pipeline.search(query, category=category, top_k=top_k)
+                chunks, debug_snapshot = pipeline.search_with_debug(query, category=category, top_k=top_k)
                 results = [chunk.to_dict() for chunk in chunks]
                 result = {
                     "status": "ok",
                     "result_count": len(results),
                     "results": results,
                 }
+                if self.settings.rag_debug:
+                    result["debug"] = debug_snapshot.to_dict(max_items=self.settings.rag_debug_top_n)
                 end_span(
                     output={
                         "status": "ok",
                         "result_count": len(results),
                         "top_results": results[:3],
+                        "debug_summary": debug_snapshot.to_trace_summary(max_items=5),
                     },
                 )
                 return result
